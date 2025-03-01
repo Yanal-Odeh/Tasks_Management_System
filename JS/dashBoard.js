@@ -1,21 +1,20 @@
-// Function to update date & time dynamically
-function updateDateTime() {
-    const now = new Date();
-    const formattedDate = now.toLocaleString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    });
-    document.getElementById('datetime').textContent = formattedDate;
-}
+const tabs = document.querySelectorAll(".menu-item");
 
-// Update time every second
-setInterval(updateDateTime, 1000);
-updateDateTime();
+    tabs.forEach(tab => {
+        tab.addEventListener("click", function (event) {
+            event.preventDefault();
+
+            // Remove active class from all tabs and contents
+            tabs.forEach(t => t.classList.remove("active"));
+            
+
+            // Add active class to clicked tab and corresponding content
+            this.classList.add("active");
+            
+        });
+    });
+
+
 
 
 
@@ -41,70 +40,48 @@ setInterval(updateDateTime, 1000);
 updateDateTime();
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Live Date & Time
-    function updateDateTime() {
-        const now = new Date();
-        document.getElementById("datetime").textContent = now.toLocaleString();
-    }
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
+    
 
     // Chart Data
-    const ctx = document.getElementById("myChart").getContext("2d");
-
-    const myChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: ["Projects", "Students", "Tasks", "Finished Projects"],
-            datasets: [
-                {
-                    label: "Dashboard Overview",
-                    data: [5, 20, 10, 2], // Your stats
-                    backgroundColor: ["#007bff", "#28a745", "#ffc107", "#dc3545"], // Colors for each bar
-                    borderColor: "#ffffff",
-                    borderWidth: 1,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: "rgba(255, 255, 255, 0.2)",
-                    },
-                    ticks: {
-                        color: "#ffffff",
-                        font: {
-                            size: 14,
-                        },
-                    },
-                },
-                x: {
-                    grid: {
-                        color: "rgba(255, 255, 255, 0.2)",
-                    },
-                    ticks: {
-                        color: "#ffffff",
-                        font: {
-                            size: 14,
-                        },
-                    },
-                },
+    
+        const ctx = document.getElementById("myChart").getContext("2d");
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Number of Projects", "Number of Students", "Number of Tasks", "Number of Finished Projects"],
+                datasets: [{
+                    label: "Count",
+                    data: [5, 20, 10, 2],
+                    backgroundColor: [
+                        "rgba(47, 138, 230, 0.1)",    // Blue for Projects
+                        "rgba(216, 189, 39, 0.1)",    // Gold/Yellow for Students
+                        "rgba(139, 69, 19, 0.1)",    // Brown for Tasks
+                        "rgba(128, 0, 128, 0.1)"     // Purple for Finished Projects
+                    ],
+                    borderColor: [
+                        "rgba(0, 100, 200, 1)", 
+                        "rgba(255, 215, 0, 1)", 
+                        "rgba(139, 69, 19, 1)", 
+                        "rgba(128, 0, 128, 1)"
+                    ],
+                    borderWidth: 1
+                }]
             },
-            plugins: {
-                legend: {
-                    display: true,
-                    labels: {
-                        color: "#ffffff",
-                        font: {
-                            size: 14,
-                        },
-                    },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
                 },
-            },
-        },
-    });
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#ddd" // Light gray legend text for dark background
+                        }
+                    }
+                }
+            }
+        });
+    
+    
 });

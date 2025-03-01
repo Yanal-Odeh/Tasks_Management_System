@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="Styles/DashBoard.css">
+    <title>Task Management Dashboard</title>
+</head>
+<body>
+<!-- dsfd -->
+    <header>
+        <div class="header-top">
+            <p>Admin<span> Ali</span></p>
+            <button type="button" class="logout-btn">LogOut</button>
+        </div> 
+    </header>
+
+    <hr>
+
+    <div class="main-container">
+        <aside>
+            <div class="aside-menu">
+                <button type="button" class="menu-item active" >Home</button>
+                <button type="button" class="menu-item">Projects</button>
+                <button type="button" class="menu-item">Tasks</button>
+                <button type="button" class="menu-item">Chat</button>
+            </div> 
+        </aside>
+        
+        <div class="vl"></div>
+
+        <main>
+            <!-- one  -->
+            <div class="title">
+                <h1>Welcome to the Task Management System</h1>
+                <p id="datetime"></p> <!-- Live Date & Time -->
+            </div>
+            <!-- two -->
+            <div class="data-container">
+                <!-- Statistics Cards -->
+                <div class="data">
+                    <div class="data-item">
+                        <h3>Number of <br> Projects</h3>
+                        <p>5</p>
+                    </div>
+                    <div class="data-item">
+                        <h3>Number of <br> Students</h3>
+                        <p>20</p>
+                    </div>
+                    <div class="data-item">
+                        <h3>Number of Tasks</h3>
+                        <p>10</p>
+                    </div>
+                    <div class="data-item">
+                        <h3>Number of <br> Finished Projects</h3>
+                        <p>2</p>
+                    </div>
+                </div>
+                <!-- three -->
+                 <div class="info">Admin Dashboard Overveiw</div>
+                <!-- four -->
+                 
+                <div class="chart-container">
+                    <canvas id="myChart"></canvas>
+                </div> 
+
+            </div>
+        </main>
+        
+
+
+
+
+    </div>
+   
+
+   
+        
+
+   
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/JS/DashBoard.js"></script>
+    
+</body>
+</html>
