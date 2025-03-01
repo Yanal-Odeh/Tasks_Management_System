@@ -232,7 +232,15 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-} 
+}
+.content-section {
+    display: none; /* Hide all sections by default */
+}
+
+.content-section.active {
+    display: block; /* Show active section */
+}
+
     
 
    

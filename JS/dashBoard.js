@@ -1,16 +1,39 @@
 const tabs = document.querySelectorAll(".menu-item");
 
+
     tabs.forEach(tab => {
         tab.addEventListener("click", function (event) {
             event.preventDefault();
 
             // Remove active class from all tabs and contents
             tabs.forEach(t => t.classList.remove("active"));
+           
             
 
             // Add active class to clicked tab and corresponding content
             this.classList.add("active");
             
+            
+            
+        });
+    });
+    const buttons = document.querySelectorAll(".menu-item");
+    const sections = document.querySelectorAll(".content-section");
+
+    buttons.forEach(button => {
+        button.addEventListener("click", function () {
+            // Remove "active" class from all buttons and sections
+            buttons.forEach(btn => btn.classList.remove("active"));
+            sections.forEach(section => section.classList.remove("active"));
+
+            // Add "active" class to the clicked button
+            this.classList.add("active");
+
+            // Get the corresponding section ID
+            let sectionId = this.textContent.toLowerCase() + "Content";
+
+            // Show the matching section
+            document.getElementById(sectionId).classList.add("active");
         });
     });
 

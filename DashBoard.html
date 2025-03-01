@@ -30,42 +30,43 @@
         <div class="vl"></div>
 
         <main>
-            <!-- one  -->
             <div class="title">
                 <h1>Welcome to the Task Management System</h1>
                 <p id="datetime"></p> <!-- Live Date & Time -->
             </div>
-            <!-- two -->
-            <div class="data-container">
-                <!-- Statistics Cards -->
-                <div class="data">
-                    <div class="data-item">
-                        <h3>Number of <br> Projects</h3>
-                        <p>5</p>
+        
+            <div id="homeContent" class="content-section active">
+                <div class="data-container">
+                    <div class="data">
+                        <div class="data-item"><h3>Number of <br> Projects</h3><p>5</p></div>
+                        <div class="data-item"><h3>Number of <br> Students</h3><p>20</p></div>
+                        <div class="data-item"><h3>Number of Tasks</h3><p>10</p></div>
+                        <div class="data-item"><h3>Number of <br> Finished Projects</h3><p>2</p></div>
                     </div>
-                    <div class="data-item">
-                        <h3>Number of <br> Students</h3>
-                        <p>20</p>
-                    </div>
-                    <div class="data-item">
-                        <h3>Number of Tasks</h3>
-                        <p>10</p>
-                    </div>
-                    <div class="data-item">
-                        <h3>Number of <br> Finished Projects</h3>
-                        <p>2</p>
+                    <div class="info">Admin Dashboard Overview</div>
+                    <div class="chart-container">
+                        <canvas id="myChart"></canvas>
                     </div>
                 </div>
-                <!-- three -->
-                 <div class="info">Admin Dashboard Overveiw</div>
-                <!-- four -->
-                 
-                <div class="chart-container">
-                    <canvas id="myChart"></canvas>
-                </div> 
-
+            </div>
+        
+            <div id="projectsContent" class="content-section">
+                <h2>Projects</h2>
+                <p>Manage your projects here.</p>
+            </div>
+        
+            <div id="tasksContent" class="content-section">
+                <h2>Tasks</h2>
+                <p>Manage your tasks here.</p>
+            </div>
+        
+            <div id="chatContent" class="content-section">
+                <h2>Chat</h2>
+                <p>Chat with team members here.</p>
             </div>
         </main>
+        
+
         
 
 
