@@ -176,11 +176,6 @@ main {
     font-weight: bold;
 }
 
-
-
-
-
-
 @media screen and (max-width: 768px) {
     .data {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
@@ -213,4 +208,12 @@ main {
     }
 }
 
-
+.info{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2.7rem;
+    background-color:inherit;
+    color: rgb(70, 69, 69);
+    padding:1rem;
+}

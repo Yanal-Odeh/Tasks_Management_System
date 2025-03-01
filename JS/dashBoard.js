@@ -17,8 +17,12 @@ function updateDateTime() {
 setInterval(updateDateTime, 1000);
 updateDateTime();
 
+
+
+
+
 // Chart.js: Simple Bar Chart
-const ctx = document.getElementById('dashboardChart').getContext('2d');
+const ctx = document.getElementById('myChart').getContext('2d');
 new Chart(ctx, {
     type: 'bar',
     data: {
@@ -38,3 +42,6 @@ new Chart(ctx, {
         }
     }
 });
+
+
+
