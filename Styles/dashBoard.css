@@ -112,6 +112,7 @@ aside .menu-item {
 }
 
 main {
+    width: 85%;
     flex: 1; //take remaining space avilable **qusay 
     flex-direction: column;
     padding: 2rem;
@@ -214,6 +215,6 @@ main {
     align-items: center;
     margin-bottom: 2.7rem;
     background-color:inherit;
-    color: rgb(70, 69, 69);
+    color: rgb(88, 78, 78);
     padding:1rem;
 }
