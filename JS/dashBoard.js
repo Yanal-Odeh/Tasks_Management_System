@@ -1,21 +1,4 @@
-const tabs = document.querySelectorAll(".menu-item");
-
-    tabs.forEach(tab => {
-        tab.addEventListener("click", function (event) {
-            event.preventDefault();
-
-            // Remove active class from all tabs and contents
-            tabs.forEach(t => t.classList.remove("active"));
-           
-            
-
-            // Add active class to clicked tab and corresponding content
-            this.classList.add("active");
-            
-            
-            
-        });
-    });
+///////////////////////////////////////////aside///////////////////////////////////////////////
 
     const buttons = document.querySelectorAll(".menu-item");
     const sections = document.querySelectorAll(".content-section");
@@ -37,15 +20,22 @@ const tabs = document.querySelectorAll(".menu-item");
         });
     });
 
+///////////////////////////////////////////aside///////////////////////////////////////////////
 
 
 
 
 
+
+
+
+
+/////////////////////////////////////////////time//////////////////////////////////////////////
 
 // Function to update date & time dynamically
 function updateDateTime() {
     const now = new Date();
+    
     const formattedDate = now.toLocaleString('en-US', {
         weekday: 'long',
         year: 'numeric',
@@ -53,14 +43,22 @@ function updateDateTime() {
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit'
-    });
+        second: '2-digit',
+        hour12: true
+    }).replace(',', '') // Removes comma after weekday
+    
     document.getElementById('datetime').textContent = formattedDate;
 }
 
 // Update time every second
 setInterval(updateDateTime, 1000);
 updateDateTime();
+
+/////////////////////////////////////////////time//////////////////////////////////////////////
+
+
+
+/////////////////////////////////////////////chart.js//////////////////////////////////////////////
 
 document.addEventListener("DOMContentLoaded", function () {
     
@@ -108,40 +106,47 @@ document.addEventListener("DOMContentLoaded", function () {
     
     });
 
+/////////////////////////////////////////////chart.js//////////////////////////////////////////////
 
 
 
-   /*** ✅ Task Modal Handling ***/
-    document.addEventListener("DOMContentLoaded", function () {
+
+
+/////////////////////////////////////*** ✅ Task Modal Handling //////////////////////////////////
+
+document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("taskModal");
+    const overlay = document.querySelector(".modal-overlay"); // Use existing overlay
     const openModalBtn = document.querySelector(".new-task-btn");
-    const closeModalBtn = document.querySelector(".close");
-    const taskForm = document.getElementById("taskForm");
+    const closeModalBtn = modal.querySelector(".close");
 
+    // Function to toggle modal visibility
+    function toggleModal(show) {
+        modal.style.display = show ? "flex" : "none";
+        overlay.style.display = show ? "block" : "none";
+    }
 
-    modal.style.display = "none";
+    // Event Listeners
+    openModalBtn.addEventListener("click", () => toggleModal(true));
+    closeModalBtn.addEventListener("click", () => toggleModal(false));
+    overlay.addEventListener("click", () => toggleModal(false));
 
-    // Open modal when clicking "Create a New Task"
-    openModalBtn.addEventListener("click", function () {
-        modal.style.display = "flex";
-    });
-
-    // Close modal when clicking "X"
-    closeModalBtn.addEventListener("click", function () {
-        modal.style.display = "none";
-    });
-
-    // Close modal when clicking outside the modal content
-    window.addEventListener("click", function (event) {
-        if (event.target === modal) {
-            modal.style.display = "none";
+    // Close modal when clicking outside of modal content
+    window.addEventListener("click", (event) => {
+        if (!modal.contains(event.target) && !openModalBtn.contains(event.target)) {
+            toggleModal(false);
         }
     });
 
-}
-);
+    // Close modal with Escape key
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modal.style.display === "flex") {
+            toggleModal(false);
+        }
+    });
+});
 
-
+/////////////////////////////////////*** ✅ Task Modal Handling //////////////////////////////////
 
 
 
