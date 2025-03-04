@@ -5,6 +5,9 @@
     text-decoration: none;
     box-sizing: border-box;
 }
+body{
+    position: relative;
+}
 
 .tasks-header {
     display: flex;
@@ -16,7 +19,7 @@
     margin-bottom: .5rem;
 }
 
-.tasks-header div {
+.tasks-header .x {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -40,9 +43,8 @@
     transition: all 0.3s ease-in-out;
 }
 
-
 #sortTasks:hover {
-    box-shadow: 0 0 0rgb(34, 145, 71)7bff;
+    box-shadow: 0 0 5px rgba(34, 145, 71, 0.7);
 }
 
 #sortTasks:focus {
@@ -51,8 +53,6 @@
     background-color:rgb(162, 171, 180);
 
 }
-
-
 
 .new-task-btn {
     background-color: #007bff;
@@ -156,7 +156,6 @@
     }
 }
 
-/* Adjustments for very small screens */
 @media screen and (max-width: 480px) {
     .tasks-header div {
         flex-direction: column;
@@ -168,8 +167,114 @@
         width: 100%;
     }
 
-    /* Hide less important columns */
     .tasks-table th:nth-child(4), 
     .tasks-table td:nth-child(4), 
     .tasks-table th:nth-child(5), 
+    .tasks-table td:nth-child(5) {
+        display: none;
+    }
 }
+
+.new-task-btn:hover {
+    background-color: #0056b3;
+}
+
+
+
+.modal {
+    position:absolute;
+    z-index: 100;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color:rgb(56, 54, 54); 
+    color: white;
+    width: 30%;  
+    height: fit-content; 
+    padding: 1.5rem;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Close button */
+.modal .close {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    color: gray;
+    cursor: pointer;
+}
+
+/* Form styles */
+.modal h2 {
+    color:rgb(35, 98, 200);
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.modal label {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    font-weight: bold;
+    display: block;
+}
+
+.modal select,
+.modal input,
+.modal textarea {
+    width: 100%;
+    padding: 0.7rem;
+    font-size: 1.2rem;
+    background-color: #222;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 5px;
+    margin-top: 0.5rem;
+}
+
+.modal textarea {
+    height: 6rem;
+    resize: none;
+}
+
+/* Add Task Button */
+.submit-btn {
+    width: 100%;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.submit-btn:hover {
+    background-color: #219150;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal {
+        width: 90vw; /* Use more width on smaller screens */
+        height: 90vh;
+        right: 5vw; /* Keeps spacing */
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,5 @@
 const tabs = document.querySelectorAll(".menu-item");
 
-
     tabs.forEach(tab => {
         tab.addEventListener("click", function (event) {
             event.preventDefault();
@@ -17,6 +16,7 @@ const tabs = document.querySelectorAll(".menu-item");
             
         });
     });
+
     const buttons = document.querySelectorAll(".menu-item");
     const sections = document.querySelectorAll(".content-section");
 
@@ -64,9 +64,7 @@ updateDateTime();
 
 document.addEventListener("DOMContentLoaded", function () {
     
-
     // Chart Data
-    
         const ctx = document.getElementById("myChart").getContext("2d");
         new Chart(ctx, {
             type: "bar",
@@ -76,11 +74,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     label: "Count",
                     data: [5, 20, 10, 2],
                     backgroundColor: [
-                        "rgba(47, 138, 230, 0.1)",    // Blue for Projects
-                        "rgba(216, 189, 39, 0.1)",    // Gold/Yellow for Students
-                        "rgba(139, 69, 19, 0.1)",    // Brown for Tasks
-                        "rgba(128, 0, 128, 0.1)"     // Purple for Finished Projects
+                        "rgba(47, 138, 230, 0.5)", 
+                        "rgba(216, 189, 39, 0.5)", 
+                        "rgba(139, 69, 19, 0.5)", 
+                        "rgba(128, 0, 128, 0.5)"
                     ],
+                    
                     borderColor: [
                         "rgba(0, 100, 200, 1)", 
                         "rgba(255, 215, 0, 1)", 
@@ -107,4 +106,46 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     
     
-});
+    });
+
+
+
+
+   /*** ✅ Task Modal Handling ***/
+    document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("taskModal");
+    const openModalBtn = document.querySelector(".new-task-btn");
+    const closeModalBtn = document.querySelector(".close");
+    const taskForm = document.getElementById("taskForm");
+
+
+    modal.style.display = "none";
+
+    // Open modal when clicking "Create a New Task"
+    openModalBtn.addEventListener("click", function () {
+        modal.style.display = "flex";
+    });
+
+    // Close modal when clicking "X"
+    closeModalBtn.addEventListener("click", function () {
+        modal.style.display = "none";
+    });
+
+    // Close modal when clicking outside the modal content
+    window.addEventListener("click", function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+
+}
+);
+
+
+
+
+
+
+
+
+

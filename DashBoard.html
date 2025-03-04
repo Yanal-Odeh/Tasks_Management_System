@@ -57,7 +57,7 @@
         <!-- three     -->
         <div id="tasksContent" class="content-section">
             <div class="tasks-header">
-                <div >
+                <div class="x">
                     <label for="sortTasks">Sort By:</label>
                     <select id="sortTasks">
                         <option value="status">Task Status</option>
@@ -66,7 +66,55 @@
                         <option value="assigned-student">Assigned Student</option>
                     </select>
                 </div>
-                <button type="button" class="new-task-btn">Create a New Task</button>
+
+            <button type="button" class="new-task-btn">Create a New Task</button>
+                    <!-- Task Creation Modal -->
+            <div id="taskModal" class="modal">
+
+                    <span class="close">&times;</span>
+
+                    <h2>Create New Task</h2>
+
+                    <form id="taskForm" autoComplete="off" >
+
+                    <label for="project">Project Title:</label>
+
+                    <select id="project" required>
+                        <option value="" disabled selected>Select a project</option>
+                        <option value="Website Redesign">Website Redesign</option>
+                        <option value="Mobile App Development">Mobile App Development</option>
+                        <option value="E-commerce Platform">E-commerce Platform</option>
+                    </select>
+
+                    <label for="taskName">Task Name:</label>
+                    <input type="text" id="taskName" placeholder="Enter task name" required>
+
+                    <label for="description">Description:</label>
+                    <textarea id="description" placeholder="Enter task description" required></textarea>
+
+                    <label for="assignedStudent">Assigned Student:</label>
+                    <select id="assignedStudent" required>
+                        <option value="" disabled selected>Select a student</option>
+                        <option value="Ali Yaseen">Ali Yaseen</option>
+                        <option value="Braa Aeesh">Braa Aeesh</option>
+                        <option value="Ibn Al-Jawzee">Ibn Al-Jawzee</option>
+                    </select>
+
+                    <label for="status">Status:</label>
+                    <select id="status" required>
+                        <option value="" disabled selected>Select a status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+
+                    <label for="dueDate">Due Date:</label>
+                    <input  type="date" id="dueDate" required>
+
+                    <button type="submit" class="submit-btn">Add Task</button>
+                </form>
+            </div>
+
             </div>
         
             <div class="tasks-table-container">
