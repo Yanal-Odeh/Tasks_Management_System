@@ -1,0 +1,160 @@
+*{
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.tasks-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color:rgb(40, 40, 40);
+    border-radius: 0.5rem;
+    margin-bottom: .5rem;
+}
+
+.tasks-header div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tasks-header label {
+    font-size: 1rem;
+    color: white;
+}
+
+#sortTasks {
+    padding: 0.5rem;
+    border-radius: 0.3rem;
+    font-size: 1.1rem;
+    border: none;
+    cursor: pointer;
+    background-color:rgb(71, 70, 70);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.new-task-btn {
+    background-color: #007bff;
+    color: white;
+    font-size: 1rem;
+    padding: 0.7rem 1.2rem;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.new-task-btn:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.tasks-table-container {
+    background-color: #1e1e1e;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow-x: auto;
+    max-height: 400px; /* Prevents excessive growth */
+    overflow-y: auto; /* Enables vertical scrolling */
+}
+
+.tasks-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    font-size: 1rem;
+}
+
+.tasks-table thead {
+    background-color: #333;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.tasks-table th, .tasks-table td {
+    padding: 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid gray;
+}
+
+.tasks-table tbody tr:nth-child(even) {
+    background-color: #252525;
+}
+
+.tasks-table tbody tr:hover {
+    background-color: #333;
+}
+
+.status {
+    font-weight: bold;
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.3rem;
+}
+
+.status.completed {
+    color: #28a745;
+}
+
+.status.in-progress {
+    color: #17a2b8; 
+}
+
+.status.pending {
+    color: #ffc107; 
+}
+
+/* RESPONSIVENESS */
+@media screen and (max-width: 768px) {
+    .tasks-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+
+    .tasks-header div {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #sortTasks {
+        width: 70%;
+    }
+
+    .new-task-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .tasks-table th, .tasks-table td {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+}
+
+/* Adjustments for very small screens */
+@media screen and (max-width: 480px) {
+    .tasks-header div {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    #sortTasks {
+        width: 100%;
+    }
+
+    /* Hide less important columns */
+    .tasks-table th:nth-child(4), 
+    .tasks-table td:nth-child(4), 
+    .tasks-table th:nth-child(5), 
+   

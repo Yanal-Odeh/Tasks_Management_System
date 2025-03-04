@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="Styles/DashBoard.css">
+    <link rel="stylesheet" type="text/css" href="Styles/Tasks.css">
+
     <title>Task Management Dashboard</title>
 </head>
 <body>
@@ -29,7 +31,7 @@
         <div class="vl"></div>
 
         <main>
-        
+        <!-- one -->
                 <div class="data-container content-section active " id="homeContent">
                     <div class="title">
                         <h1>Welcome to the Task Management System</h1>
@@ -46,17 +48,92 @@
                         <canvas id="myChart"></canvas>
                     </div>
                 </div>
-
+        <!-- two         -->
             <div id="projectsContent" class="content-section">
                 <h2>Projects</h2>
                 <p>Manage your projects here.</p>
             </div>
         
-            <div id="tasksContent" class="content-section">
-                <h2>Tasks</h2>
-                <p>Manage your tasks here.</p>
+        <!-- three     -->
+        <div id="tasksContent" class="content-section">
+            <div class="tasks-header">
+                <div >
+                    <label for="sortTasks">Sort By:</label>
+                    <select id="sortTasks">
+                        <option value="status">Task Status</option>
+                        <option value="due-date">Due Date</option>
+                        <option value="project">Project</option>
+                    </select>
+                </div>
+                <button type="button" class="new-task-btn">Create a New Task</button>
             </div>
         
+            <div class="tasks-table-container">
+                <table class="tasks-table">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Project</th>
+                            <th>Task Name</th>
+                            <th>Description</th>
+                            <th>Assigned Student</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Website Redesign</td>
+                            <td>Design Homepage</td>
+                            <td>Create a responsive design for the homepage.</td>
+                            <td>Ali Yaseen</td>
+                            <td class="status in-progress">In Progress</td>
+                            <td>4/22/2023</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Website Redesign</td>
+                            <td>Develop API</td>
+                            <td>Set up the backend API for the project.</td>
+                            <td>Braa Aeesh</td>
+                            <td class="status completed">Completed</td>
+                            <td>1/16/2023</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Mobile App Development</td>
+                            <td>Write Documentation</td>
+                            <td>Document the project setup and usage.</td>
+                            <td>Ibn Al-Jawzee</td>
+                            <td class="status pending">Pending</td>
+                            <td>3/15/2023</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Mobile App Development</td>
+                            <td>Testing</td>
+                            <td>Conduct testing for all features.</td>
+                            <td>Ibn Malik</td>
+                            <td class="status in-progress">In Progress</td>
+                            <td>11/29/2023</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>E-commerce Platform</td>
+                            <td>Deploy Application</td>
+                            <td>Deploy the application to the production server.</td>
+                            <td>Ayman Outom</td>
+                            <td class="status pending">Pending</td>
+                            <td>3/24/2023</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        
+        <!-- four     -->
             <div id="chatContent" class="content-section">
                 <div class="stud-part">
                 <h2>List of Students</h2>
