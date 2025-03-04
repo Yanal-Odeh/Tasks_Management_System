@@ -189,11 +189,9 @@ body{
 
 
 .modal {
-
     width: 50%;
     max-width: 600px;
     min-width: 300px;
-
     position:absolute;
     z-index: 100;
     left: 50%;
@@ -202,7 +200,7 @@ body{
     background-color:rgb(46, 45, 45); 
     color: white;
     /* width: 30%;   */
-    height: fit-content; 
+    /* height: fit-content;  */
     padding: 1.5rem;
     border-radius: 10px;
     display: flex;

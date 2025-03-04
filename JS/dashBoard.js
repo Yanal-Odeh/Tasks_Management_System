@@ -113,7 +113,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 /////////////////////////////////////*** ✅ Task Modal Handling //////////////////////////////////
-
 document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("taskModal");
     const overlay = document.querySelector(".modal-overlay"); // Use existing overlay
@@ -145,12 +144,54 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-
 /////////////////////////////////////*** ✅ Task Modal Handling //////////////////////////////////
 
 
+document.getElementById("sortTasks").addEventListener("change", function () {
+    const sortBy = this.value;
+    const tableBody = document.querySelector(".tasks-table tbody");
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
 
+    rows.sort((rowA, rowB) => {
+        let cellA, cellB;
 
+        switch (sortBy) {
+            case "status":
+                cellA = rowA.querySelector(".status").textContent.trim().toLowerCase();
+                cellB = rowB.querySelector(".status").textContent.trim().toLowerCase();
+                return cellA.localeCompare(cellB); // Alphabetical sorting
 
+            case "project":
+                cellA = rowA.cells[1].textContent.trim().toLowerCase();
+                cellB = rowB.cells[1].textContent.trim().toLowerCase();
+                return cellA.localeCompare(cellB);
+
+            case "due-date":
+                cellA = Date.parse(rowA.cells[6].textContent.trim()); // Convert to timestamp
+                cellB = Date.parse(rowB.cells[6].textContent.trim());
+                return cellA - cellB; // Sort from earliest to latest
+
+            case "assigned-student":
+                cellA = rowA.cells[4].textContent.trim().toLowerCase();
+                cellB = rowB.cells[4].textContent.trim().toLowerCase();
+                return cellA.localeCompare(cellB);
+
+            case "priority":
+                const priorityOrder = { "high": 1, "medium": 2, "low": 3 };
+                cellA = rowA.cells[2].textContent.trim().toLowerCase();
+                cellB = rowB.cells[2].textContent.trim().toLowerCase();
+                return priorityOrder[cellA] - priorityOrder[cellB]; // Sort High → Medium → Low
+
+            case "tasks-count":
+                cellA = parseFloat(rowA.cells[3].textContent.trim()); // Convert to number
+                cellB = parseFloat(rowB.cells[3].textContent.trim());
+                return cellA - cellB; // Sort numerically (ascending)
+        }
+    });
+
+    // Clear and append sorted rows back to the table
+    tableBody.innerHTML = "";
+    rows.forEach(row => tableBody.appendChild(row));
+});
 
 
