@@ -1,21 +1,4 @@
-const tabs = document.querySelectorAll(".menu-item");
-
-    tabs.forEach(tab => {
-        tab.addEventListener("click", function (event) {
-            event.preventDefault();
-
-            // Remove active class from all tabs and contents
-            tabs.forEach(t => t.classList.remove("active"));
-           
-            
-
-            // Add active class to clicked tab and corresponding content
-            this.classList.add("active");
-            
-            
-            
-        });
-    });
+///////////////////////////////////////////aside///////////////////////////////////////////////
 
     const buttons = document.querySelectorAll(".menu-item");
     const sections = document.querySelectorAll(".content-section");
@@ -37,15 +20,22 @@ const tabs = document.querySelectorAll(".menu-item");
         });
     });
 
+///////////////////////////////////////////aside///////////////////////////////////////////////
 
 
 
 
 
+
+
+
+
+/////////////////////////////////////////////time//////////////////////////////////////////////
 
 // Function to update date & time dynamically
 function updateDateTime() {
     const now = new Date();
+    
     const formattedDate = now.toLocaleString('en-US', {
         weekday: 'long',
         year: 'numeric',
@@ -53,14 +43,22 @@ function updateDateTime() {
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit'
-    });
+        second: '2-digit',
+        hour12: true
+    }).replace(',', '') // Removes comma after weekday
+    
     document.getElementById('datetime').textContent = formattedDate;
 }
 
 // Update time every second
 setInterval(updateDateTime, 1000);
 updateDateTime();
+
+/////////////////////////////////////////////time//////////////////////////////////////////////
+
+
+
+/////////////////////////////////////////////chart.js//////////////////////////////////////////////
 
 document.addEventListener("DOMContentLoaded", function () {
     
@@ -108,44 +106,92 @@ document.addEventListener("DOMContentLoaded", function () {
     
     });
 
+/////////////////////////////////////////////chart.js//////////////////////////////////////////////
 
 
 
-   /*** ✅ Task Modal Handling ***/
-    document.addEventListener("DOMContentLoaded", function () {
+
+
+/////////////////////////////////////*** ✅ Task Modal Handling //////////////////////////////////
+document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("taskModal");
+    const overlay = document.querySelector(".modal-overlay"); // Use existing overlay
     const openModalBtn = document.querySelector(".new-task-btn");
-    const closeModalBtn = document.querySelector(".close");
-    const taskForm = document.getElementById("taskForm");
+    const closeModalBtn = modal.querySelector(".close");
 
+    // Function to toggle modal visibility
+    function toggleModal(show) {
+        modal.style.display = show ? "flex" : "none";
+        overlay.style.display = show ? "block" : "none";
+    }
 
-    modal.style.display = "none";
+    // Event Listeners
+    openModalBtn.addEventListener("click", () => toggleModal(true));
+    closeModalBtn.addEventListener("click", () => toggleModal(false));
+    overlay.addEventListener("click", () => toggleModal(false));
 
-    // Open modal when clicking "Create a New Task"
-    openModalBtn.addEventListener("click", function () {
-        modal.style.display = "flex";
-    });
-
-    // Close modal when clicking "X"
-    closeModalBtn.addEventListener("click", function () {
-        modal.style.display = "none";
-    });
-
-    // Close modal when clicking outside the modal content
-    window.addEventListener("click", function (event) {
-        if (event.target === modal) {
-            modal.style.display = "none";
+    // Close modal when clicking outside of modal content
+    window.addEventListener("click", (event) => {
+        if (!modal.contains(event.target) && !openModalBtn.contains(event.target)) {
+            toggleModal(false);
         }
     });
 
-}
-);
+    // Close modal with Escape key
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modal.style.display === "flex") {
+            toggleModal(false);
+        }
+    });
+});
+/////////////////////////////////////*** ✅ Task Modal Handling //////////////////////////////////
 
 
+document.getElementById("sortTasks").addEventListener("change", function () {
+    const sortBy = this.value;
+    const tableBody = document.querySelector(".tasks-table tbody");
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
 
+    rows.sort((rowA, rowB) => {
+        let cellA, cellB;
 
+        switch (sortBy) {
+            case "status":
+                cellA = rowA.querySelector(".status").textContent.trim().toLowerCase();
+                cellB = rowB.querySelector(".status").textContent.trim().toLowerCase();
+                return cellA.localeCompare(cellB); // Alphabetical sorting
 
+            case "project":
+                cellA = rowA.cells[1].textContent.trim().toLowerCase();
+                cellB = rowB.cells[1].textContent.trim().toLowerCase();
+                return cellA.localeCompare(cellB);
 
+            case "due-date":
+                cellA = Date.parse(rowA.cells[6].textContent.trim()); // Convert to timestamp
+                cellB = Date.parse(rowB.cells[6].textContent.trim());
+                return cellA - cellB; // Sort from earliest to latest
 
+            case "assigned-student":
+                cellA = rowA.cells[4].textContent.trim().toLowerCase();
+                cellB = rowB.cells[4].textContent.trim().toLowerCase();
+                return cellA.localeCompare(cellB);
+
+            case "priority":
+                const priorityOrder = { "high": 1, "medium": 2, "low": 3 };
+                cellA = rowA.cells[2].textContent.trim().toLowerCase();
+                cellB = rowB.cells[2].textContent.trim().toLowerCase();
+                return priorityOrder[cellA] - priorityOrder[cellB]; // Sort High → Medium → Low
+
+            case "tasks-count":
+                cellA = parseFloat(rowA.cells[3].textContent.trim()); // Convert to number
+                cellB = parseFloat(rowB.cells[3].textContent.trim());
+                return cellA - cellB; // Sort numerically (ascending)
+        }
+    });
+
+    // Clear and append sorted rows back to the table
+    tableBody.innerHTML = "";
+    rows.forEach(row => tableBody.appendChild(row));
+});
 
 
