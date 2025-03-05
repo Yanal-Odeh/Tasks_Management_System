@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="Styles/Chat.css">
     <link rel="stylesheet" type="text/css" href="Styles/DashBoard.css">
+    <link rel="stylesheet" type="text/css" href="Styles/Project.css">
     <link rel="stylesheet" type="text/css" href="Styles/Tasks.css">
 
     <title>Task Management Dashboard</title>
@@ -59,10 +60,28 @@
                     </div>
                 </div>
         <!-- two         -->
-            <div id="projectsContent" class="content-section">
-                <h2>Projects</h2>
-                <p>Manage your projects here.</p>
+        <div id="projectsContent" class="content-section ">
+            <h2 class="section-title">Projects Overview</h2>
+        
+            <!-- Add New Project Button & Search -->
+            <div class="project-controls">
+                <button type="button" class="add-project-btn">Add New Project</button>
+                <input type="text" id="projectSearch" placeholder="Search projects by title or description...">
+                <label for="projectStatusFilter">Filter by Status:</label>
+                <select id="projectStatusFilter">
+                    <option value="all">All Statuses</option>
+                    <option value="completed">Completed</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="pending">Pending</option>
+                </select>
             </div>
+        
+            <!-- Project Cards Container (Grid Layout) -->
+            <div class="project-grid" id="projectContainer">
+                <!-- Dynamic Projects Will Be Inserted Here -->
+            </div>
+        </div>
+        
         
         <!-- three     -->
         <div id="tasksContent" class="content-section">
@@ -123,23 +142,6 @@
         <label for="dueDate">Due Date:</label>
         <input type="date" id="dueDate" required>
 
-        <!-- Task Priority (New Field) -->
-        <label for="priority">Priority:</label>
-        <select id="priority" required>
-            <option value="" disabled selected>Select priority</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-        </select>
-
-        <!-- Task Type (New Field) -->
-        <label for="taskType">Task Type:</label>
-        <select id="taskType" required>
-            <option value="" disabled selected>Select task type</option>
-            <option value="Development">Development</option>
-            <option value="Design">Design</option>
-            <option value="Testing">Testing</option>
-        </select>
 
         <!-- Submit Button -->
         <button type="submit" class="submit-btn">Add Task</button>
