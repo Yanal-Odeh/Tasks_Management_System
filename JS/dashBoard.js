@@ -318,7 +318,225 @@ document.addEventListener("DOMContentLoaded", function () {
 /////////////////////////////////////*** ✅ add data task daynamiclly//////////////////////////////////
 
 
+/////////////////////////////////////*** ✅ add night mode//////////////////////////////////
+const mode = document.querySelector(".icon");
+mode.onclick = changeMode;
+
+function changeMode(){
+    document.querySelector("header").classList.toggle("mode");
+    
+    
+    
+}
 
 
 
+/////////////////////////////////////*** ✅ add night mode//////////////////////////////////
+
+
+/////////////////////////////////////*** ✅ add admin span name//////////////////////////////////
+document.addEventListener("DOMContentLoaded", () => {
+    // Get admin details from sessionStorage or localStorage
+    const adminData = sessionStorage.getItem("currentAdmin") || localStorage.getItem("currentAdmin");
+
+    if (!adminData) {
+        // If no admin is logged in, redirect to the sign-in page
+        window.location.assign("../Signin.html"); // Adjust the path as needed
+        return;
+    }
+
+    // Parse admin data
+    const admin = JSON.parse(adminData);
+
+    // Select the admin name element and update it dynamically
+    const adminNameSpan = document.querySelector(".header-top span");
+    if (adminNameSpan) {
+        adminNameSpan.textContent = admin.userName; // Display logged-in admin's username
+    }
+
+    // Handle logout button click
+    const logoutBtn = document.querySelector(".logout-btn");
+    logoutBtn.addEventListener("click", () => {
+        sessionStorage.removeItem("currentAdmin");
+        localStorage.removeItem("currentAdmin"); // Clears persistent login too
+        window.location.assign("../Signin.html"); // Redirect to sign-in page
+    });
+});
+
+/////////////////////////////////////*** ✅ add admin span name//////////////////////////////////
+
+
+/////////////////////////////////////*** ✅ project Modal Handling //////////////////////////////////
+
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("projectModal");
+    const overlay = document.querySelector(".modal-overlay");
+    const openModalBtn = document.querySelector(".add-project-btn");
+    const closeModalBtn = document.querySelector(".modal .close");
+
+    // Open modal
+    openModalBtn.addEventListener("click", function () {
+        modal.style.display = "block";
+        overlay.style.display = "block";
+    });
+
+    // Close modal
+    closeModalBtn.addEventListener("click", function () {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+
+    // Close modal when clicking outside
+    overlay.addEventListener("click", function () {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+});
+
+
+/////////////////////////////////////*** ✅ Project Modal Handling //////////////////////////////////
+
+/////////////////////////////////////*** ✅ add data project daynamiclly///////////////////////
+
+document.addEventListener("DOMContentLoaded", function () {
+    const projectContainer = document.getElementById("projectContainer");
+    const projectForm = document.getElementById("projectForm");
+    const modal = document.getElementById("projectModal");
+    const overlay = document.querySelector(".modal-overlay");
+    const addProjectBtn = document.querySelector(".add-project-btn");
+    const closeModalBtn = document.querySelector(".modal .close");
+
+    // Sample Projects Data
+    let projects = [
+        {
+            title: "Website Redesign",
+            description: "Redesign the company website to improve user experience.",
+            students: ["Student 1", "Student 2"],
+            category: "Web Development",
+            startDate: "2023-01-01",
+            endDate: "2023-06-01",
+            progress: 100,
+            borderColor: "blue"
+        },
+        {
+            title: "Mobile App Development",
+            description: "Develop a mobile application for our services.",
+            students: ["Student 3", "Student 4"],
+            category: "Mobile Development",
+            startDate: "2023-02-15",
+            endDate: "2023-08-15",
+            progress: 100,
+            borderColor: "orange"
+        },
+        {
+            title: "Data Analysis Project",
+            description: "Analyze data from the last quarter to find insights.",
+            students: ["Student 5"],
+            category: "Data Science",
+            startDate: "2023-03-01",
+            endDate: "2023-05-01",
+            progress: 100,
+            borderColor: "blue"
+        },
+        {
+            title: "Machine Learning Model",
+            description: "Create a machine learning model for predictions.",
+            students: ["Student 1", "Student 3"],
+            category: "Machine Learning",
+            startDate: "2023-04-01",
+            endDate: "2023-09-01",
+            progress: 100,
+            borderColor: "gray"
+        },
+        {
+            title: "Machine Learning Model",
+            description: "Create a machine learning model for predictions 2.",
+            students: ["Student 1", "Student 3"],
+            category: "Machine Learning",
+            startDate: "2023-04-01",
+            endDate: "2026-09-01",
+            progress: 56,
+            borderColor: "gray"
+        }
+    ];
+
+    // Function to Render Projects
+    function renderProjects() {
+        projectContainer.innerHTML = ""; // Clear existing content
+
+        projects.forEach((project, index) => {
+            const projectCard = document.createElement("div");
+            projectCard.classList.add("project-card");
+            projectCard.style.border = `2px solid ${project.borderColor}`;
+
+            projectCard.innerHTML = `
+                <h3 style="color:${project.borderColor}">${project.title}</h3>
+                <p><strong>Description:</strong> ${project.description}</p>
+                <p><strong>Students:</strong> ${project.students.join(", ")}</p>
+                <p><strong>Category:</strong> ${project.category}</p>
+                <div class="progress-bar">
+                    <div class="progress" style="width:${project.progress}%">${project.progress}%</div>
+                </div>
+                <p>${project.startDate} &nbsp;&nbsp;&nbsp; ${project.endDate}</p>
+                
+            `;
+
+            projectContainer.appendChild(projectCard);
+        });
+
+        // Attach event listeners to delete buttons
+        
+    }
+
+    // Function to Handle Form Submission (Adding New Project)
+    projectForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const title = document.getElementById("projectTitle").value;
+        const description = document.getElementById("projectDescription").value;
+        const students = Array.from(document.getElementById("studentsList").selectedOptions).map(option => option.value);
+        const category = document.getElementById("projectCategory").value;
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+        const status = document.getElementById("projectStatus").value;
+
+        if (!title || !description || students.length === 0 || category === "Select a category" || !startDate || !endDate) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        const borderColor = status === "Completed" ? "green" : status === "In Progress" ? "orange" : "gray";
+        const progress = status === "Completed" ? 100 : status === "In Progress" ? 50 : 0;
+
+        // Add new project to array
+        projects.push({ title, description, students, category, startDate, endDate, progress, borderColor });
+
+        renderProjects(); // Update project list
+        projectForm.reset(); // Clear form
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+
+    // Open Modal
+    addProjectBtn.addEventListener("click", function () {
+        modal.style.display = "block";
+        overlay.style.display = "block";
+    });
+
+    // Close Modal
+    closeModalBtn.addEventListener("click", function () {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+
+    overlay.addEventListener("click", function () {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+
+    renderProjects(); // Load initial projects when page loads
+});
+
+
+/////////////////////////////////////*** ✅ add data project daynamiclly///////////////////////
 
