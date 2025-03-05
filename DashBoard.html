@@ -2,7 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
+    <link rel="shortcut icon" href="favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="favicon/site.webmanifest" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="Styles/Chat.css">
     <link rel="stylesheet" type="text/css" href="Styles/DashBoard.css">
     <link rel="stylesheet" type="text/css" href="Styles/Tasks.css">
 
@@ -20,6 +28,8 @@
 
     <div class="main-container">
         <aside>
+            <button type="button" class="menu-toggle">&#9776;</button> <!-- Hamburger Menu -->
+            
             <div class="aside-menu">
                 <button type="button" class="menu-item active" >Home</button>
                 <button type="button" class="menu-item">Projects</button>
@@ -57,7 +67,7 @@
         <!-- three     -->
         <div id="tasksContent" class="content-section">
             <div class="tasks-header">
-                <div class="x">
+                <div class="popup">
                     <label for="sortTasks">Sort By:</label>
                     <select id="sortTasks">
                         <option value="status">Task Status</option>
@@ -70,50 +80,72 @@
             <button type="button" class="new-task-btn">Create a New Task</button>
                     <!-- Task Creation Modal -->
             <div id="taskModal" class="modal">
+    <span class="close">&times;</span>
+    <h2>Create New Task</h2>
 
-                    <span class="close">&times;</span>
+    <form id="taskForm" autocomplete="off">
+        <!-- Project Selection -->
+        <label for="project">Project Title:</label>
+        <select id="project" required>
+            <option value="" disabled selected>Select a project</option>
+            <option value="Website Redesign">Website Redesign</option>
+            <option value="Mobile App Development">Mobile App Development</option>
+            <option value="E-commerce Platform">E-commerce Platform</option>
+        </select>
 
-                    <h2>Create New Task</h2>
+        <!-- Task Name Input -->
+        <label for="taskName">Task Name:</label>
+        <input type="text" id="taskName" placeholder="Enter task name" required>
 
-                    <form id="taskForm" autoComplete="off" >
+        <!-- Task Description -->
+        <label for="description">Description:</label>
+        <textarea id="description" placeholder="Enter task description" required></textarea>
 
-                    <label for="project">Project Title:</label>
+        <!-- Assigned Student Selection -->
+        <label for="assignedStudent">Assigned Student:</label>
+        <select id="assignedStudent" required>
+            <option value="" disabled selected>Select a student</option>
+            <option value="Ali Yaseen">Ali Yaseen</option>
+            <option value="Braa Aeesh">Braa Aeesh</option>
+            <option value="Ibn Al-Jawzee">Ibn Al-Jawzee</option>
+        </select>
 
-                    <select id="project" required>
-                        <option value="" disabled selected>Select a project</option>
-                        <option value="Website Redesign">Website Redesign</option>
-                        <option value="Mobile App Development">Mobile App Development</option>
-                        <option value="E-commerce Platform">E-commerce Platform</option>
-                    </select>
+        <!-- Task Status -->
+        <label for="status">Status:</label>
+        <select id="status" required>
+            <option value="" disabled selected>Select a status</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+        </select>
 
-                    <label for="taskName">Task Name:</label>
-                    <input type="text" id="taskName" placeholder="Enter task name" required>
+        <!-- Due Date Picker (Fixed Default to Today) -->
+        <label for="dueDate">Due Date:</label>
+        <input type="date" id="dueDate" required>
 
-                    <label for="description">Description:</label>
-                    <textarea id="description" placeholder="Enter task description" required></textarea>
+        <!-- Task Priority (New Field) -->
+        <label for="priority">Priority:</label>
+        <select id="priority" required>
+            <option value="" disabled selected>Select priority</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+        </select>
 
-                    <label for="assignedStudent">Assigned Student:</label>
-                    <select id="assignedStudent" required>
-                        <option value="" disabled selected>Select a student</option>
-                        <option value="Ali Yaseen">Ali Yaseen</option>
-                        <option value="Braa Aeesh">Braa Aeesh</option>
-                        <option value="Ibn Al-Jawzee">Ibn Al-Jawzee</option>
-                    </select>
+        <!-- Task Type (New Field) -->
+        <label for="taskType">Task Type:</label>
+        <select id="taskType" required>
+            <option value="" disabled selected>Select task type</option>
+            <option value="Development">Development</option>
+            <option value="Design">Design</option>
+            <option value="Testing">Testing</option>
+        </select>
 
-                    <label for="status">Status:</label>
-                    <select id="status" required>
-                        <option value="" disabled selected>Select a status</option>
-                        <option value="Pending">Pending</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                    </select>
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn">Add Task</button>
+    </form>
+</div>
 
-                    <label for="dueDate">Due Date:</label>
-                    <input  type="date" id="dueDate" required>
-
-                    <button type="submit" class="submit-btn">Add Task</button>
-                </form>
-            </div>
 
             </div>
 
@@ -149,7 +181,7 @@
                             <td>Set up the backend API for the project.</td>
                             <td>Braa Aeesh</td>
                             <td class="status completed">Completed</td>
-                            <td>1/16/2023</td>
+                            <td>2023-01-05 </td>
                         </tr>
                         <tr>
                             <td>3</td>
@@ -158,7 +190,7 @@
                             <td>Document the project setup and usage.</td>
                             <td>Ibn Al-Jawzee</td>
                             <td class="status pending">Pending</td>
-                            <td>3/15/2023</td>
+                            <td>2021-01-05</td>
                         </tr>
                         <tr>
                             <td>4</td>
@@ -167,7 +199,7 @@
                             <td>Conduct testing for all features.</td>
                             <td>Ibn Malik</td>
                             <td class="status in-progress">In Progress</td>
-                            <td>11/29/2023</td>
+                            <td>2019-01-05</td>
                         </tr>
                         <tr>
                             <td>5</td>
@@ -176,7 +208,7 @@
                             <td>Deploy the application to the production server.</td>
                             <td>Ayman Outom</td>
                             <td class="status pending">Pending</td>
-                            <td>3/24/2023</td>
+                            <td>2021-03-24</td>
                         </tr>
                     </tbody>
                 </table>
@@ -198,7 +230,7 @@
                     <div class="student"><p>Salah Salah</p></div>
                     <div class="student"><p>Yahya Leader</p></div>
                     <div class="student"><p>Salam Kareem</p></div>
-                    <div class="student"><p>Issac Nasir/p></div>
+                    <div class="student"><p>Issac Nasir</p></div>
                     <div class="student"><p>Saeed Salam</p></div>
                 </div>
             </div>

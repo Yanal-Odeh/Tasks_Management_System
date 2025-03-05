@@ -20,7 +20,7 @@ body{
     margin-bottom: .5rem;
 }
 
-.tasks-header .x {
+.tasks-header .popup {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -142,7 +142,7 @@ body{
         gap: 0.8rem;
     }
 
-    .tasks-header div {
+    .tasks-header popup {
         width: 100%;
         display: flex;
         justify-content: space-between;
@@ -199,8 +199,6 @@ body{
     transform: translate(-50%, -50%);
     background-color:rgb(46, 45, 45); 
     color: white;
-    /* width: 30%;   */
-    /* height: fit-content;  */
     padding: 1.5rem;
     border-radius: 10px;
     display: flex;

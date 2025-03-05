@@ -1,24 +1,61 @@
 ///////////////////////////////////////////aside///////////////////////////////////////////////
 
-    const buttons = document.querySelectorAll(".menu-item");
-    const sections = document.querySelectorAll(".content-section");
-
-    buttons.forEach(button => {
-        button.addEventListener("click", function () {
-            // Remove "active" class from all buttons and sections
-            buttons.forEach(btn => btn.classList.remove("active"));
-            sections.forEach(section => section.classList.remove("active"));
-
-            // Add "active" class to the clicked button
-            this.classList.add("active");
-
-            // Get the corresponding section ID
-            let sectionId = this.textContent.toLowerCase() + "Content";
-
-            // Show the matching section
-            document.getElementById(sectionId).classList.add("active");
+    document.addEventListener("DOMContentLoaded", function () {
+        // Sidebar Navigation Handling
+        const buttons = document.querySelectorAll(".menu-item");
+        const sections = document.querySelectorAll(".content-section");
+    
+        buttons.forEach(button => {
+            button.addEventListener("click", function () {
+                // Remove "active" class from all buttons and sections
+                buttons.forEach(btn => btn.classList.remove("active"));
+                sections.forEach(section => section.classList.remove("active"));
+    
+                // Add "active" class to the clicked button
+                this.classList.add("active");
+    
+                // Get the corresponding section ID
+                let sectionId = this.textContent.toLowerCase() + "Content";
+    
+                // Show the matching section
+                document.getElementById(sectionId).classList.add("active");
+    
+                // Close sidebar on mobile after clicking a menu item
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove("active");
+                }
+            });
+        });
+    
+        // Hamburger Menu Toggle for Mobile
+        const menuToggle = document.querySelector(".menu-toggle");
+        const sidebar = document.querySelector("aside");
+    
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener("click", function () {
+                sidebar.classList.toggle("active");
+            });
+        }
+    
+        // Close sidebar when clicking outside (for mobile view)
+        document.addEventListener("click", function (event) {
+            if (window.innerWidth <= 768 && sidebar.classList.contains("active")) {
+                if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                    sidebar.classList.remove("active");
+                }
+            }
+        });
+    
+        // Ensure sidebar resets on window resize
+        window.addEventListener("resize", function () {
+            if (window.innerWidth > 768) {
+                sidebar.classList.add("active"); // Keep sidebar open on larger screens
+            } else {
+                sidebar.classList.remove("active"); // Keep sidebar closed on small screens
+            }
         });
     });
+    
 
 ///////////////////////////////////////////aside///////////////////////////////////////////////
 
@@ -115,37 +152,51 @@ document.addEventListener("DOMContentLoaded", function () {
 /////////////////////////////////////*** ✅ Task Modal Handling //////////////////////////////////
 document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("taskModal");
-    const overlay = document.querySelector(".modal-overlay"); // Use existing overlay
+    const overlay = document.querySelector(".modal-overlay");
     const openModalBtn = document.querySelector(".new-task-btn");
     const closeModalBtn = modal.querySelector(".close");
 
+    // Ensure the modal is hidden on page load
+    modal.style.display = "none";
+    overlay.style.display = "none";
+
     // Function to toggle modal visibility
     function toggleModal(show) {
-        modal.style.display = show ? "flex" : "none";
-        overlay.style.display = show ? "block" : "none";
+        if (show) {
+            modal.style.display = "flex";
+            overlay.style.display = "block";
+        } else {
+            modal.style.display = "none";
+            overlay.style.display = "none";
+        }
     }
 
-    // Event Listeners
+    // Open Modal only when clicking the button
     openModalBtn.addEventListener("click", () => toggleModal(true));
-    closeModalBtn.addEventListener("click", () => toggleModal(false));
-    overlay.addEventListener("click", () => toggleModal(false));
 
-    // Close modal when clicking outside of modal content
+    // Close Modal (X Button)
+    closeModalBtn.addEventListener("click", () => toggleModal(false));
+
+    // Close Modal when clicking outside of it
     window.addEventListener("click", (event) => {
-        if (!modal.contains(event.target) && !openModalBtn.contains(event.target)) {
+        if (modal.style.display === "flex" && !modal.contains(event.target) && !openModalBtn.contains(event.target)) {
             toggleModal(false);
         }
     });
 
-    // Close modal with Escape key
+    // Close Modal with Escape key
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && modal.style.display === "flex") {
             toggleModal(false);
         }
     });
 });
+
 /////////////////////////////////////*** ✅ Task Modal Handling //////////////////////////////////
 
+
+
+/////////////////////////////////////*** ✅ sorting table//////////////////////////////////
 
 document.getElementById("sortTasks").addEventListener("change", function () {
     const sortBy = this.value;
@@ -175,17 +226,6 @@ document.getElementById("sortTasks").addEventListener("change", function () {
                 cellA = rowA.cells[4].textContent.trim().toLowerCase();
                 cellB = rowB.cells[4].textContent.trim().toLowerCase();
                 return cellA.localeCompare(cellB);
-
-            case "priority":
-                const priorityOrder = { "high": 1, "medium": 2, "low": 3 };
-                cellA = rowA.cells[2].textContent.trim().toLowerCase();
-                cellB = rowB.cells[2].textContent.trim().toLowerCase();
-                return priorityOrder[cellA] - priorityOrder[cellB]; // Sort High → Medium → Low
-
-            case "tasks-count":
-                cellA = parseFloat(rowA.cells[3].textContent.trim()); // Convert to number
-                cellB = parseFloat(rowB.cells[3].textContent.trim());
-                return cellA - cellB; // Sort numerically (ascending)
         }
     });
 
@@ -194,4 +234,86 @@ document.getElementById("sortTasks").addEventListener("change", function () {
     rows.forEach(row => tableBody.appendChild(row));
 });
 
+/////////////////////////////////////*** ✅ sorting table//////////////////////////////////
+
+
+
+
+/////////////////////////////////////*** ✅ add data task daynamiclly///////////////////////
+
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("taskModal");
+    const overlay = document.querySelector(".modal-overlay");
+    const openModalBtn = document.querySelector(".new-task-btn");
+    const closeModalBtn = modal.querySelector(".close");
+    const taskForm = document.getElementById("taskForm");
+    const tableBody = document.querySelector(".tasks-table tbody");
+
+    modal.style.display = "none";
+    overlay.style.display = "none";
+
+    function toggleModal(show) {
+        if (show) {
+            modal.style.display = "flex";
+            overlay.style.display = "block";
+        } else {
+            modal.style.display = "none";
+            overlay.style.display = "none";
+        }
+    }
+
+    openModalBtn.addEventListener("click", () => toggleModal(true));
+    closeModalBtn.addEventListener("click", () => toggleModal(false));
+
+    window.addEventListener("click", (event) => {
+        if (modal.style.display === "flex" && !modal.contains(event.target) && !openModalBtn.contains(event.target)) {
+            toggleModal(false);
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modal.style.display === "flex") {
+            toggleModal(false);
+        }
+    });
+
+    // ✅ Add New Task to Table Dynamically
+    taskForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent form from reloading the page
+
+        // Get input values
+        const project = document.getElementById("project").value;
+        const taskName = document.getElementById("taskName").value;
+        const description = document.getElementById("description").value;
+        const assignedStudent = document.getElementById("assignedStudent").value;
+        const status = document.getElementById("status").value;
+        const dueDate = document.getElementById("dueDate").value;
+
+        // Generate a new Task ID
+        const newTaskId = tableBody.rows.length + 1;
+
+        // Create a new row
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <td>${newTaskId}</td>
+            <td>${project}</td>
+            <td>${taskName}</td>
+            <td>${description}</td>
+            <td>${assignedStudent}</td>
+            <td class="status ${status.toLowerCase()}">${status}</td>
+            <td>${dueDate}</td>
+        `;
+
+        // Append the new row to the table
+        tableBody.appendChild(newRow);
+
+        // Reset the form
+        taskForm.reset();
+
+        // Close the modal after submitting
+        toggleModal(false);
+    });
+});
+
+/////////////////////////////////////*** ✅ add data task daynamiclly//////////////////////////////////
 

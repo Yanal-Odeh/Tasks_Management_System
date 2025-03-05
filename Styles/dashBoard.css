@@ -72,6 +72,8 @@ hr {
     min-height: 100vh;
 }
 
+
+
 aside {
     width: 14.7%;
     background: linear-gradient(0deg, rgb(103, 112, 112) 0%, rgba(31, 30, 29, 1) 100%);
@@ -79,6 +81,21 @@ aside {
     flex-direction: column;
     align-items: center;
     padding-top: 1rem;
+    transition: width 0.3s ease;
+}
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: white;
+    cursor: pointer;
+    position: absolute;
+    top: .5rem;
+    left: 1rem;
+    z-index: 1100;
+
 }
 
 aside .aside-menu {
@@ -103,17 +120,40 @@ aside .menu-item {
 
 @media screen and (max-width: 768px) {
     aside {
-        width: 50px;
-        transition: width 0.3s ease;
+        width: 0;
+        overflow: hidden;
+        padding: 0;
+        position: fixed;
+        height: 100%;
+        left: 0;
+        top: 0;
+        z-index: 1000;
+        background-color: #222;
+        transition: width 0.3s ease-in-out;
     }
+
     .aside-menu {
         display: none;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
     }
-    aside:hover {
-        width: 150px;
-    }
-    aside:hover .aside-menu {
+
+    .menu-toggle {
         display: block;
+        position: fixed;
+        top: .1rem;
+        left: 1.5rem;
+        z-index: 1100;
+    }
+
+    aside.active {
+        width: 60%;
+        padding-top: 3rem;
+    }
+
+    aside.active .aside-menu {
+        display: flex;
     }
 }
 
@@ -136,7 +176,6 @@ aside .menu-item {
 main {
     flex-grow: 1;
     width: 85%;
-    /*height: 100%;*/
     display: flex;
     flex-direction: column;
     padding: 2rem;
@@ -254,80 +293,6 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-.chat-container{
-    display: flex;
-    height: 90%;
-    gap: 2rem;
-    
-}
-
-.content-section h2{
-    color: white;
-}
-.students{
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-left: 0.7rem;
-    margin-top: 0.3rem;
-
-}
-.student{
-    width: 18rem;
-    height: 3.5rem;
-    background-color: rgb(80, 79, 79);
-    border-radius: 0.5rem;
-    
-    
-    
-    
-}
-.students p{
-    margin-top: 0.8rem;
-    margin-left: 0.6rem;
-    font-size: 1.3rem;
-}
-.chat-part{
-    width: 90%;
-    height: 40%;
-    background-color: rgb(44, 43, 43);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 1.7rem;
-    border-radius: 0.6rem;
-    box-shadow:  0.1rem 0.1rem 0.7rem #080808;
-}
-.msg{
-    width: 97%;
-    margin-left: 1rem;
-    border-radius: 0.6rem;
-    color: white;
-    padding: 1rem;
-    background-color: rgba(8, 221, 8, 0.733);
-    text-align: end;
-}
-.left-margin{
-    margin-left: 1.2rem;
-}
-.message{
-    display: flex;
-}
-
-.message input[type="text"]{
-    width: 85%;
-    padding: 0.6rem;
-    border-radius: 0.5rem;
-    background-color: rgb(61, 60, 60);
-    margin-left:1.2rem;
-}
-.message input[type="submit"]{
-    padding: 0.7rem 1rem;
-    border-radius: 0.6rem;
-    background-color: rgba(8, 221, 8, 0.733);
-    color: white;
-    margin-left:0.7rem;
 }
 
 
