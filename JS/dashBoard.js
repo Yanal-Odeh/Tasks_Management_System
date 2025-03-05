@@ -505,7 +505,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const borderColor = status === "Completed" ? "green" : status === "In Progress" ? "orange" : "gray";
+        const borderColor = status === "Completed" ? "orange" : status === "In Progress" ? "blue" : "gray";
         const progress = status === "Completed" ? 100 : status === "In Progress" ? 50 : 0;
 
         // Add new project to array
