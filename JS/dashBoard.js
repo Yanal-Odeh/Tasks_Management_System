@@ -396,8 +396,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /////////////////////////////////////*** ✅ Project Modal Handling //////////////////////////////////
 
-/////////////////////////////////////*** ✅ add data project daynamiclly///////////////////////
-
+/////////////////////////////////////*** ✅  project tab ///////////////////////
 document.addEventListener("DOMContentLoaded", function () {
     const projectContainer = document.getElementById("projectContainer");
     const projectForm = document.getElementById("projectForm");
@@ -405,9 +404,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const overlay = document.querySelector(".modal-overlay");
     const addProjectBtn = document.querySelector(".add-project-btn");
     const closeModalBtn = document.querySelector(".modal .close");
+    const projectSearch = document.getElementById("projectSearch");
+    const projectStatusFilter = document.getElementById("projectStatusFilter");
 
-    // Sample Projects Data
-    let projects = [
+    // Load projects from localStorage or use default sample projects
+    let projects = JSON.parse(localStorage.getItem("projects")) || [
         {
             title: "Website Redesign",
             description: "Redesign the company website to improve user experience.",
@@ -415,8 +416,9 @@ document.addEventListener("DOMContentLoaded", function () {
             category: "Web Development",
             startDate: "2023-01-01",
             endDate: "2023-06-01",
+            status: "Completed", // Ensure it matches exactly
             progress: 100,
-            borderColor: "blue"
+            borderColor: "orange"
         },
         {
             title: "Mobile App Development",
@@ -425,46 +427,50 @@ document.addEventListener("DOMContentLoaded", function () {
             category: "Mobile Development",
             startDate: "2023-02-15",
             endDate: "2023-08-15",
+            status: "Completed",
             progress: 100,
             borderColor: "orange"
-        },
-        {
-            title: "Data Analysis Project",
-            description: "Analyze data from the last quarter to find insights.",
-            students: ["Student 5"],
-            category: "Data Science",
-            startDate: "2023-03-01",
-            endDate: "2023-05-01",
-            progress: 100,
-            borderColor: "blue"
         },
         {
             title: "Machine Learning Model",
             description: "Create a machine learning model for predictions.",
             students: ["Student 1", "Student 3"],
-            category: "Machine Learning",
+            category: "AI & ML",
             startDate: "2023-04-01",
             endDate: "2023-09-01",
-            progress: 100,
-            borderColor: "gray"
+            status: "In-Progress",
+            progress: 50,
+            borderColor: "blue"
         },
         {
-            title: "Machine Learning Model",
-            description: "Create a machine learning model for predictions 2.",
-            students: ["Student 1", "Student 3"],
-            category: "Machine Learning",
-            startDate: "2023-04-01",
-            endDate: "2026-09-01",
-            progress: 56,
+            title: "AI Security System",
+            description: "Build an AI system for real-time security monitoring.",
+            students: ["Student 2", "Student 4"],
+            category: "AI & ML",
+            startDate: "2023-07-01",
+            endDate: "2024-01-01",
+            status: "Pending",
+            progress: 0,
             borderColor: "gray"
         }
     ];
+    
+
+    // Function to save projects to localStorage
+    function saveProjectsToStorage() {
+        localStorage.setItem("projects", JSON.stringify(projects));
+    }
 
     // Function to Render Projects
-    function renderProjects() {
+    function renderProjects(filteredProjects = projects) {
         projectContainer.innerHTML = ""; // Clear existing content
 
-        projects.forEach((project, index) => {
+        if (filteredProjects.length === 0) {
+            projectContainer.innerHTML = `<p style="color: white;">No projects found.</p>`;
+            return;
+        }
+
+        filteredProjects.forEach((project, index) => {
             const projectCard = document.createElement("div");
             projectCard.classList.add("project-card");
             projectCard.style.border = `2px solid ${project.borderColor}`;
@@ -474,19 +480,47 @@ document.addEventListener("DOMContentLoaded", function () {
                 <p><strong>Description:</strong> ${project.description}</p>
                 <p><strong>Students:</strong> ${project.students.join(", ")}</p>
                 <p><strong>Category:</strong> ${project.category}</p>
+                <p><strong>Status:</strong> ${project.status}</p>
                 <div class="progress-bar">
                     <div class="progress" style="width:${project.progress}%">${project.progress}%</div>
                 </div>
                 <p>${project.startDate} &nbsp;&nbsp;&nbsp; ${project.endDate}</p>
-                
+                <button class="delete-project-btn" data-index="${index}">Delete</button>
             `;
 
             projectContainer.appendChild(projectCard);
         });
 
-        // Attach event listeners to delete buttons
-        
+        // Add delete functionality
+        document.querySelectorAll(".delete-project-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const index = this.getAttribute("data-index");
+                projects.splice(index, 1); // Remove project from array
+                saveProjectsToStorage(); // Update localStorage
+                renderProjects(); // Re-render projects
+            });
+        });
     }
+
+    // Function to Filter Projects Based on Search and Status
+    function filterProjects() {
+        const searchTerm = projectSearch.value.toLowerCase().trim();
+        const selectedStatus = projectStatusFilter.value.trim(); 
+
+        const filteredProjects = projects.filter(project => {
+            const matchesSearch = project.title.toLowerCase().includes(searchTerm) ||  project.description.toLowerCase().includes(searchTerm);
+
+            const matchesStatus = selectedStatus === "all" || project.status.toLowerCase() === selectedStatus.toLowerCase();
+
+            return matchesSearch && matchesStatus;
+        });
+
+        renderProjects(filteredProjects);
+    }
+
+    // Event Listeners for Search and Filter
+    projectSearch.addEventListener("input", filterProjects);
+    projectStatusFilter.addEventListener("change", filterProjects);
 
     // Function to Handle Form Submission (Adding New Project)
     projectForm.addEventListener("submit", function (event) {
@@ -498,32 +532,35 @@ document.addEventListener("DOMContentLoaded", function () {
         const category = document.getElementById("projectCategory").value;
         const startDate = document.getElementById("startDate").value;
         const endDate = document.getElementById("endDate").value;
-        const status = document.getElementById("projectStatus").value;
+        const status = document.getElementById("projectStatus").value.trim(); 
 
         if (!title || !description || students.length === 0 || category === "Select a category" || !startDate || !endDate) {
             alert("Please fill in all fields.");
             return;
         }
 
-        const borderColor = status === "Completed" ? "orange" : status === "In Progress" ? "blue" : "gray";
-        const progress = status === "Completed" ? 100 : status === "In Progress" ? 50 : 0;
+        const borderColor = status === "Completed" ? "orange" : status === "In-Progress" ? "blue" : "gray";
+        const progress = status === "Completed" ? 100 : status === "In-Progress" ? 50 : 0;
 
         // Add new project to array
-        projects.push({ title, description, students, category, startDate, endDate, progress, borderColor });
+        projects.push({ title, description, students, category, startDate, endDate, status, progress, borderColor });
 
-        renderProjects(); // Update project list
-        projectForm.reset(); // Clear form
+        // Save to localStorage
+        saveProjectsToStorage();
+
+        // Refresh Project List
+        renderProjects();
+        projectForm.reset();
         modal.style.display = "none";
         overlay.style.display = "none";
     });
 
-    // Open Modal
+    // Open/Close Modal
     addProjectBtn.addEventListener("click", function () {
         modal.style.display = "block";
         overlay.style.display = "block";
     });
 
-    // Close Modal
     closeModalBtn.addEventListener("click", function () {
         modal.style.display = "none";
         overlay.style.display = "none";
@@ -534,9 +571,12 @@ document.addEventListener("DOMContentLoaded", function () {
         overlay.style.display = "none";
     });
 
-    renderProjects(); // Load initial projects when page loads
+    // Load Projects on Page Load
+    renderProjects();
 });
 
+/////////////////////////////////////*** ✅  project tab ///////////////////////
 
-/////////////////////////////////////*** ✅ add data project daynamiclly///////////////////////
+
+
 
