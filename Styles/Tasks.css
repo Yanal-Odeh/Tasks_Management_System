@@ -6,10 +6,6 @@
     box-sizing: border-box;
 }
 
-body{
-    position: relative;
-}
-
 .tasks-header {
     display: flex;
     align-items: center;
@@ -49,8 +45,7 @@ body{
 }
 
 #sortTasks:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgb(65, 188, 93);
+    box-shadow: 1px 1px 1px 2px rgb(65, 188, 93);
     background-color:rgb(162, 171, 180);
 
 }
@@ -68,31 +63,23 @@ body{
 }
 
 
-.tasks-table {
-    min-width: 600px;
-}
-
-
-.new-task-btn:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
-
 .tasks-table-container {
-    background-color: #1e1e1e;
+    background-color:rgb(23, 23, 23);
     border-radius: 0.5rem;
     padding: 1rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     overflow-x: auto;
-    max-height: 400px; /* Prevents excessive growth */
-    overflow-y: auto; /* Enables vertical scrolling */
+    max-height: calc(100vh - 150px); /* Adjust based on header/footer size */
+    overflow-y: auto;
 }
 
 .tasks-table {
     width: 100%;
     border-collapse: collapse;
     color: white;
-    font-size: 1rem;
+    font-weight:bold;
+    font-size: 1.2rem;
+     min-width: 600px;
 }
 
 .tasks-table thead {
@@ -116,12 +103,6 @@ body{
     background-color: #333;
 }
 
-.status {
-    font-weight: bold;
-    padding: 0.3rem 0.5rem;
-    border-radius: 0.3rem;
-}
-
 .status.completed {
     color: #28a745;
 }
@@ -132,6 +113,23 @@ body{
 
 .status.pending {
     color: #ffc107; 
+}
+
+.status.on-hold{
+    color:rgb(47, 29, 84);
+}
+
+.status.cancelled{
+    color:rgb(158, 13, 13);
+}
+
+form #status,form #assignedStudent,form #assignedStudent,form #project{
+    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+}
+form #status:focus,form #assignedStudent:focus,form #project:focus{
+    box-shadow: 0 0 5px rgba(39, 193, 47, 0.7);
+    background: rgba(183,183,182,255);
 }
 
 /* RESPONSIVENESS */
@@ -184,11 +182,12 @@ body{
 
 .new-task-btn:hover {
     background-color: #0056b3;
+    transform: scale(1.05);
 }
 
 
-
 .modal {
+    
     width: 50%;
     max-width: 600px;
     min-width: 300px;
@@ -276,9 +275,6 @@ body{
     }
 }
 
-
-
-/* Modal Overlay */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -287,10 +283,9 @@ body{
     height: 100vh;
     background: rgba(0, 0, 0, 0.6); 
     z-index: 99; 
-    display: none; /* Initially hidden */
+    display: none; 
 }
 
-/* Show overlay when modal is active */
 .modal.active {
     display: flex;
 }
@@ -298,13 +293,6 @@ body{
 .modal.active + .modal-overlay {
     display: block;
 }
-
-
-.modal select {
-    appearance: none; 
-    padding-right: 1.5rem; 
-}
-
 
 
 

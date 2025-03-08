@@ -26,8 +26,10 @@
         </div> 
     </header>
 
+
     <hr>
-<!-- adasd -->
+
+
     <div class="main-container">
         <aside>
             <button type="button" class="menu-toggle">&#9776;</button> <!-- Hamburger Menu -->
@@ -60,7 +62,13 @@
                         <canvas id="myChart"></canvas>
                     </div>
                 </div>
-        <!-- two         -->
+
+
+
+        <!-- two  -->
+
+
+
         <div id="projectsContent" class="content-section ">
             <h2 class="section-title">Projects Overview</h2>
         
@@ -77,7 +85,6 @@
                 </select>
             </div>
         
-            <!-- Project Cards Container (Grid Layout) -->
             <div class="project-grid" id="projectContainer">
                 <!-- Dynamic Projects Will Be Inserted Here -->
             </div>
@@ -130,7 +137,7 @@
         
         
         
-        <!-- three     -->
+        <!-- three -->
         <div id="tasksContent" class="content-section">
             <div class="tasks-header">
                 <div class="popup">
@@ -153,12 +160,13 @@
         <!-- Project Selection -->
         <label for="project">Project Title:</label>
         <select id="project" required>
-            <option value="" disabled selected>Select a project</option>
+            <option selected disabled value="">Select a project</option>
             <option value="Website Redesign">Website Redesign</option>
             <option value="Mobile App Development">Mobile App Development</option>
-            <option value="E-commerce Platform">E-commerce Platform</option>
+            <option value="Data Analysis ">Data Analysis Project</option>   
+            <option value="Machine Learning ">Machine Learning Model</option>
         </select>
-
+            
         <!-- Task Name Input -->
         <label for="taskName">Task Name:</label>
         <input type="text" id="taskName" placeholder="Enter task name" required>
@@ -170,30 +178,36 @@
         <!-- Assigned Student Selection -->
         <label for="assignedStudent">Assigned Student:</label>
         <select id="assignedStudent" required>
-            <option value="" disabled selected>Select a student</option>
-            <option value="Ali Yaseen">Ali Yaseen</option>
-            <option value="Braa Aeesh">Braa Aeesh</option>
-            <option value="Ibn Al-Jawzee">Ibn Al-Jawzee</option>
+            <option selected disabled value="">Select a student</option>
+            <option value="ali_yaseen">Ali Yaseen</option>
+            <option value="braa_aeesh">Braa Aeesh</option>
+            <option value="ibn_al_jawzee">Ibn Al-Jawzee</option>
+            <option value="ibn_malik">Ibn Malik</option>
+            <option value="ayman_outom">Ayman Outom</option>
+            <option value="salah_salah">Salah Salah</option>
+            <option value="yahya_leader">Yahya Leader</option>
+            <option value="salam_kareem">Salam Kareem</option>
+            <option value="isaac_nasir">Isaac Nasir</option>
+            <option value="saeed_salam">Saeed Salam</option>
         </select>
 
         <!-- Task Status -->
         <label for="status">Status:</label>
         <select id="status" required>
-            <option value="" disabled selected>Select a status</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
+            <option selected disabled>Select a status</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="pending">Pending</option>
+            <option value="on-hold">On Hold</option>
+            <option value="cancelled">Cancelled</option>
         </select>
 
-        <!-- Due Date Picker (Fixed Default to Today) -->
         <label for="dueDate">Due Date:</label>
         <input type="date" id="dueDate" required>
 
-
-        <!-- Submit Button -->
         <button type="submit" class="submit-btn">Add Task</button>
     </form>
-</div>
+ </div>
 
 
             </div>
@@ -214,7 +228,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <!-- <tr>
                             <td>1</td>
                             <td>Website Redesign</td>
                             <td>Design Homepage</td>
@@ -258,7 +272,7 @@
                             <td>Ayman Outom</td>
                             <td class="status pending">Pending</td>
                             <td>2021-03-24</td>
-                        </tr>
+                        </tr> -->
                     </tbody>
                 </table>
             </div>
