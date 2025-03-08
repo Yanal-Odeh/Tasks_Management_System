@@ -318,6 +318,12 @@ function changeMode(){
     document.querySelectorAll(".student").forEach(element => {
         element.classList.toggle("teal-background");
     })
+    document.querySelectorAll(".modal input").forEach(element => { 
+        element.classList.toggle("teal-background");
+    })
+    document.querySelectorAll(".modal select").forEach(element => { 
+        element.classList.toggle("teal-background");
+    })
     document.querySelector("header div p").classList.toggle("dark-text");
     document.querySelector("#datetime").classList.toggle("dark-text");
     document.querySelector(".project-controls input").classList.toggle("teal-background");
@@ -326,6 +332,9 @@ function changeMode(){
     document.querySelector(".chat-part").classList.toggle("teal-background");
     document.querySelector(".message input").classList.toggle("teal-background");
     document.querySelector(".message input").classList.toggle("light-text");
+    document.querySelector(".modal").classList.toggle("teal-background");
+    document.querySelector(".modal textarea").classList.toggle("teal-background");
+    
     
 }
 
