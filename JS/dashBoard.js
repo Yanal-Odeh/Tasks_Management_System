@@ -323,9 +323,33 @@ const mode = document.querySelector(".icon");
 mode.onclick = changeMode;
 
 function changeMode(){
-    document.querySelector("header").classList.toggle("mode");
-    
-    
+    document.querySelector("header").classList.toggle("light-background");
+    document.querySelector("aside").classList.toggle("light-background");
+    document.querySelector("main").classList.toggle("light-background");
+    document.querySelector("#myChart").classList.toggle("light-background");
+    document.querySelectorAll(".data-item").forEach(element => {
+        element.classList.toggle("teal-background");
+    })
+    document.querySelectorAll(".menu-item").forEach(element => {
+        element.classList.toggle("teal-background");
+    })
+    document.querySelectorAll(".menu-item").forEach(element => {
+        element.classList.toggle("blue-background");
+    })
+    document.querySelectorAll(".project-grid div").forEach(element => { 
+        element.classList.toggle("teal-background");
+    })
+    document.querySelectorAll(".student").forEach(element => {
+        element.classList.toggle("teal-background");
+    })
+    document.querySelector("header div p").classList.toggle("dark-text");
+    document.querySelector("#datetime").classList.toggle("dark-text");
+    document.querySelector(".project-controls input").classList.toggle("teal-background");
+    document.querySelector(".project-controls input").classList.toggle("light-text");
+    document.querySelector(".project-controls select").classList.toggle("teal-background");
+    document.querySelector(".chat-part").classList.toggle("teal-background");
+    document.querySelector(".message input").classList.toggle("teal-background");
+    document.querySelector(".message input").classList.toggle("light-text");
     
 }
 

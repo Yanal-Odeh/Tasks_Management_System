@@ -311,9 +311,24 @@ main {
 .content-section.active {
     display: block; /* Show active section */
 }
-.mode{
-    background: #f5f5f5;
-    color: #1e1e1e;
+.light-background{
+    background: #ffffff;
+    
+}
+.dark-background{
+    background: #800020 !important;
+}
+.dark-text{
+    color: #1e1e1e !important;
+}
+.teal-background{
+    background: #008080!important;
+}
+.blue-background:hover{
+    background: #007bff!important;
+}
+.light-text::placeholder{
+    color: #f5f3f3 !important;
 }
 
 
