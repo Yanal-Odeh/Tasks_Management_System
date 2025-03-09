@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
         toggleModal(false);
     });
 
-    // ✅ Sorting Functionality (Preserves Table Instead of Clearing It)
+    // ✅ Sorting Functionality (Sort & Reassign Task IDs)
     sortSelect.addEventListener("change", function () {
         const sortBy = this.value;
         let tasks = getTasksFromStorage();
@@ -228,12 +228,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 break;
         }
 
-        // Save sorted tasks & reload table without clearing it
+        // Reassign task IDs after sorting to maintain sequential order
+        tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
+
+        // Save sorted tasks & reload table
         saveTasksToStorage(tasks);
         refreshTaskTable(tasks);
     });
 
-    // ✅ Sorting Functions
+    // ✅ Sorting Functions (Maintains Task Order & Reassigns IDs)
     function sortByStatus(tasks) {
         return tasks.sort((a, b) => a.status.localeCompare(b.status));
     }
@@ -273,10 +276,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ Refresh Task Table Without Clearing Everything
     function refreshTaskTable(tasks) {
-        const currentTasks = Array.from(tableBody.children);
-        currentTasks.forEach(row => tableBody.removeChild(row)); // Remove rows without clearing storage
-
-        tasks.forEach(addTaskToTable); // Append new order without resetting
+        tableBody.innerHTML = ""; // Clear the table body only (not local storage)
+        tasks.forEach(addTaskToTable);
     }
 
     // ✅ Get Tasks from Local Storage
@@ -289,6 +290,7 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("tasks", JSON.stringify(tasks));
     }
 });
+
 
 /////////////////////////////////////✅ Task Modal Handling + sorting//////////////////////////////////
 
