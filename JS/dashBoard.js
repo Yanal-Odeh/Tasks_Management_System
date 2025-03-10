@@ -402,7 +402,6 @@ function changeMode() {
     // ✅ Toggle Light/Night Mode for "Sort By" Label
     document.querySelector("label[for='sortTasks']").classList.toggle("night-mode");
 
-    console.log("Light mode toggled successfully!");
 }
 
 
@@ -661,44 +660,106 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-// Function to show/hide loader
-function toggleLoader(show) {
-    const loader = document.getElementById("loader");
-    loader.style.display = show ? "block" : "none";
-}
 
-// Modify Task Form Submission to Show Loader
-taskForm.addEventListener("submit", function (event) {
-    event.preventDefault();
+///////////////////////////////////// ✅ delete task ///////////////////////
 
-    // Show loader
-    toggleLoader(true);
+document.addEventListener("DOMContentLoaded", function () {
+    const tableBody = document.querySelector(".tasks-table tbody");
+    const deleteTaskBtn = document.querySelector(".delete-task-btn");
 
-    setTimeout(() => {
-        // Get input values
-        const project = document.getElementById("project").value;
-        const taskName = document.getElementById("taskName").value;
-        const description = document.getElementById("description").value;
-        const assignedStudent = document.getElementById("assignedStudent").value;
-        const status = document.getElementById("status").value;
-        const dueDate = document.getElementById("dueDate").value;
+    let selectedTask = null; // Stores the selected row for deletion
+
+    // ✅ Function to Select a Task Row on Left Click
+    tableBody.addEventListener("click", function (event) {
+        const row = event.target.closest("tr"); // Get the clicked row
+        if (!row) return;
+
+        // Remove previous selection
+        document.querySelectorAll(".tasks-table tbody tr").forEach(r => r.classList.remove("selected"));
+
+        // Highlight the selected row
+        row.classList.add("selected");
+        selectedTask = row;
+        deleteTaskBtn.removeAttribute("disabled"); // Enable delete button
+    });
+
+    // ✅ Function to Deselect a Task Row on Right Click
+    tableBody.addEventListener("contextmenu", function (event) {
+        event.preventDefault(); // Prevents the default right-click menu
+
+        // Remove selection
+        document.querySelectorAll(".tasks-table tbody tr").forEach(r => r.classList.remove("selected"));
+        selectedTask = null;
+
+        // Disable delete button if no row is selected
+        deleteTaskBtn.setAttribute("disabled", "true");
+    });
+
+    // ✅ Function to Delete a Selected Task
+    deleteTaskBtn.addEventListener("click", function () {
+        if (!selectedTask) return;
+
+        const confirmDelete = confirm("⚠️ Are you sure you want to delete this task?");
+        if (!confirmDelete) return;
+
+        const taskId = selectedTask.cells[0].textContent; // Get Task ID
+
+        // Remove from UI
+        selectedTask.remove();
+        selectedTask = null;
+
+        // Disable delete button if no more tasks remain
+        if (tableBody.children.length === 0) {
+            deleteTaskBtn.setAttribute("disabled", "true");
+        }
+
+        // Remove from Local Storage
+        let tasks = getTasksFromStorage();
+        tasks = tasks.filter(task => task.id !== parseInt(taskId));
+        saveTasksToStorage(tasks);
+
+        // Refresh the table
+        loadTasksFromStorage();
+    });
+
+    // ✅ Function to Load Tasks from Local Storage
+    function loadTasksFromStorage() {
+        tableBody.innerHTML = ""; // Clear table before reloading
 
         let tasks = getTasksFromStorage();
-        let lastTaskId = tasks.length ? Math.max(...tasks.map(task => task.id)) : 0;
-        const newTaskId = lastTaskId + 1;
+        if (tasks.length === 0) {
+            deleteTaskBtn.setAttribute("disabled", "true"); // Disable delete if no tasks exist
+        }
 
-        const newTask = { id: newTaskId, project, taskName, description, assignedStudent, status, dueDate };
-        tasks.push(newTask);
-        saveTasksToStorage(tasks);
-        addTaskToTable(newTask);
+        tasks.forEach(addTaskToTable);
+    }
 
-        // Hide loader after operation is complete
-        toggleLoader(false);
+    // ✅ Function to Add a Task to the Table
+    function addTaskToTable(task) {
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <td>${task.id}</td>
+            <td>${task.project}</td>
+            <td>${task.taskName}</td>
+            <td>${task.description}</td>
+            <td>${task.assignedStudent}</td>
+            <td class="status ${task.status.toLowerCase()}">${task.status}</td>
+            <td>${task.dueDate}</td>
+        `;
+        tableBody.appendChild(newRow);
+    }
 
-        // Reset the form & close modal
-        taskForm.reset();
-        toggleModal(false);
-    }, 1000); // Simulate network delay
+    // ✅ Get Tasks from Local Storage
+    function getTasksFromStorage() {
+        return JSON.parse(localStorage.getItem("tasks")) || [];
+    }
+
+    // ✅ Save Tasks to Local Storage
+    function saveTasksToStorage(tasks) {
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    // Load tasks on page load
+    loadTasksFromStorage();
 });
-
-
+///////////////////////////////////// ✅ delete task ///////////////////////
