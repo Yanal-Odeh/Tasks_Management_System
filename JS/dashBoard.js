@@ -669,10 +669,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let selectedTask = null; // Stores the selected row for deletion
 
-    // ✅ Function to Select a Task Row on Left Click
+    // ✅ Function to Select a Task Row on Left Click (Does Not Deselect)
     tableBody.addEventListener("click", function (event) {
         const row = event.target.closest("tr"); // Get the clicked row
-        if (!row) return;
+        if (!row || row === selectedTask) return; // Prevent reselecting the same row
 
         // Remove previous selection
         document.querySelectorAll(".tasks-table tbody tr").forEach(r => r.classList.remove("selected"));
@@ -683,7 +683,7 @@ document.addEventListener("DOMContentLoaded", function () {
         deleteTaskBtn.removeAttribute("disabled"); // Enable delete button
     });
 
-    // ✅ Function to Deselect a Task Row on Right Click
+    // ✅ Function to Deselect a Task Row on Right Click ONLY
     tableBody.addEventListener("contextmenu", function (event) {
         event.preventDefault(); // Prevents the default right-click menu
 
@@ -695,40 +695,51 @@ document.addEventListener("DOMContentLoaded", function () {
         deleteTaskBtn.setAttribute("disabled", "true");
     });
 
-    // ✅ Function to Delete a Selected Task
+    // ✅ Function to Delete a Selected Task and Reassign IDs
     deleteTaskBtn.addEventListener("click", function () {
         if (!selectedTask) return;
 
         const confirmDelete = confirm("⚠️ Are you sure you want to delete this task?");
         if (!confirmDelete) return;
 
-        const taskId = selectedTask.cells[0].textContent; // Get Task ID
+        const taskId = parseInt(selectedTask.cells[0].textContent); // Get Task ID
 
         // Remove from UI
         selectedTask.remove();
-        selectedTask = null;
-
-        // Disable delete button if no more tasks remain
-        if (tableBody.children.length === 0) {
-            deleteTaskBtn.setAttribute("disabled", "true");
-        }
 
         // Remove from Local Storage
         let tasks = getTasksFromStorage();
-        tasks = tasks.filter(task => task.id !== parseInt(taskId));
+        tasks = tasks.filter(task => task.id !== taskId);
+
+        // Reassign task IDs starting from 1
+        tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
+
+        // Save updated task list
         saveTasksToStorage(tasks);
 
-        // Refresh the table
+        // Refresh the table with updated IDs
         loadTasksFromStorage();
+
+        // ✅ Auto-deselect after deleting (User must select a new row)
+        selectedTask = null;
+        deleteTaskBtn.setAttribute("disabled", "true");
     });
 
-    // ✅ Function to Load Tasks from Local Storage
+    // ✅ Function to Load Tasks from Local Storage and Reassign IDs
     function loadTasksFromStorage() {
         tableBody.innerHTML = ""; // Clear table before reloading
 
         let tasks = getTasksFromStorage();
+
+        // Reassign task IDs starting from 1 (in case of missing IDs)
+        tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
+
+        // Save updated task list
+        saveTasksToStorage(tasks);
+
+        // Disable delete if no tasks exist
         if (tasks.length === 0) {
-            deleteTaskBtn.setAttribute("disabled", "true"); // Disable delete if no tasks exist
+            deleteTaskBtn.setAttribute("disabled", "true");
         }
 
         tasks.forEach(addTaskToTable);
@@ -762,4 +773,5 @@ document.addEventListener("DOMContentLoaded", function () {
     // Load tasks on page load
     loadTasksFromStorage();
 });
+
 ///////////////////////////////////// ✅ delete task ///////////////////////

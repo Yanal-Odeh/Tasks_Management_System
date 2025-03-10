@@ -136,7 +136,7 @@
 }
 
 .status.on-hold{
-    color:rgb(47, 29, 84);
+    color:rgb(67, 39, 124);
 }
 
 .status.cancelled{
@@ -144,12 +144,13 @@
 }
 
 form #status,form #assignedStudent,form #project{
-    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    transition: background-color  0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 
 }
 form #status:focus,form #assignedStudent:focus,form #project:focus{
     box-shadow: 0 0 5px rgba(39, 193, 47, 0.7);
     background: rgba(183,183,182,255);
+    color:black;
 }
 
 
