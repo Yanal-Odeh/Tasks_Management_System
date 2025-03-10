@@ -11,7 +11,6 @@
     align-items: center;
     justify-content: space-between;
     padding: 1rem;
-    background-color:rgb(40, 40, 40);
     border-radius: 0.5rem;
     margin-bottom: .5rem;
 }
@@ -86,7 +85,7 @@
     background-color: #333;
     position: sticky;
     top: 0;
-    z-index: 10;
+    /* z-index: 10; */
 }
 
 .tasks-table th, .tasks-table td {
@@ -123,7 +122,7 @@
     color:rgb(158, 13, 13);
 }
 
-form #status,form #assignedStudent,form #assignedStudent,form #project{
+form #status,form #assignedStudent,form #project{
     transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 
 }
@@ -295,6 +294,32 @@ form #status:focus,form #assignedStudent:focus,form #project:focus{
 }
 
 
+
+.light-background label {
+    color: #1e1e1e !important; 
+    font-weight: bold;
+}
+
+.light-background .tasks-table-container {
+    background:rgba(198, 193, 193, 0.25)!important;
+}
+
+.light-background .tasks-table {
+    background: #008080!important;
+}
+
+.light-background .tasks-table th {
+    background:rgb(136, 86, 86)!important;
+    color:rgb(255, 255, 255) !important;
+}
+
+.light-background .tasks-table tbody tr:nth-child(even) {
+    background-color:rgb(153, 153, 153) !important; 
+}
+
+.light-background .tasks-table tbody tr:hover {
+    background-color:rgb(162, 32, 32) !important; 
+}
 
 
 

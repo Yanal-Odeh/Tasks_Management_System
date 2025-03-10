@@ -59,6 +59,10 @@
 ///////////////////////////////////////////aside///////////////////////////////////////////////
 
 
+
+
+
+
 /////////////////////////////////////////////time//////////////////////////////////////////////
 
 // Function to update date & time dynamically
@@ -84,6 +88,9 @@ setInterval(updateDateTime, 1000);
 updateDateTime();
 
 /////////////////////////////////////////////time//////////////////////////////////////////////
+
+
+
 
 
 
@@ -136,6 +143,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 /////////////////////////////////////////////chart.js//////////////////////////////////////////////
+
+
 
 
 
@@ -296,51 +305,214 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+
+
+
 /////////////////////////////////////*** ✅ add night mode//////////////////////////////////
+
+
+
+
+
+// const mode = document.querySelector(".icon");
+// mode.onclick = changeMode;
+
+// function changeMode() {
+//     document.querySelector("#tasksContent").classList.toggle("light-background");
+//     document.querySelector(".tasks-table-container").classList.toggle("light-background");
+//     document.querySelector(".tasks-header").classList.toggle("light-background");
+//     document.querySelector("#sortTasks").classList.toggle("light-text");
+//     document.querySelector(".new-task-btn").classList.toggle("light-background");
+
+//     document.querySelector(".tasks-table").classList.toggle("light-background");
+//     document.querySelector(".tasks-table-container").classList.toggle("light-background");
+
+//     document.querySelectorAll(".tasks-table th").forEach(element => {
+//         element.classList.toggle("light-background");
+//         element.classList.toggle("dark-text");
+//     });
+
+//     document.querySelectorAll(".tasks-table td").forEach(element => {
+//         element.classList.toggle("dark-text");
+//     });
+
+//     document.querySelectorAll(".tasks-table tbody tr:nth-child(even)").forEach(element => {
+//         element.classList.toggle("light-background");
+//     });
+
+//     document.querySelectorAll(".tasks-table tbody tr:hover").forEach(element => {
+//         element.classList.toggle("light-background");
+//     });
+
+//     document.querySelectorAll(".status").forEach(element => {
+//         element.classList.toggle("dark-text");
+//     });
+
+//     document.querySelector("header").classList.toggle("light-background");
+//     document.querySelector("aside").classList.toggle("light-background");
+//     document.querySelector("main").classList.toggle("light-background");
+//     document.querySelector("#myChart").classList.toggle("light-background");
+
+//     document.querySelectorAll(".data-item").forEach(element => {
+//         element.classList.toggle("teal-background");
+//     });
+
+//     document.querySelectorAll(".menu-item").forEach(element => {
+//         element.classList.toggle("teal-background");
+//     });
+
+//     document.querySelectorAll(".menu-item").forEach(element => {
+//         element.classList.toggle("blue-background");
+//     });
+
+//     document.querySelectorAll(".project-grid div").forEach(element => { 
+//         element.classList.toggle("teal-background");
+//     });
+
+//     document.querySelectorAll(".student").forEach(element => {
+//         element.classList.toggle("teal-background");
+//     });
+
+//     document.querySelectorAll(".modal input").forEach(element => { 
+//         element.classList.toggle("teal-background");
+//     });
+
+//     document.querySelectorAll(".modal select").forEach(element => { 
+//         element.classList.toggle("teal-background");
+//     });
+
+//     document.querySelectorAll(".modal textarea").forEach(element => { 
+//         element.classList.toggle("teal-background");
+//     });
+
+//     document.querySelector("header div p").classList.toggle("dark-text");
+//     document.querySelector("#datetime").classList.toggle("dark-text");
+
+//     document.querySelector(".project-controls input").classList.toggle("teal-background");
+//     document.querySelector(".project-controls input").classList.toggle("light-text");
+
+//     document.querySelector(".project-controls select").classList.toggle("teal-background");
+
+//     document.querySelector(".chat-part").classList.toggle("teal-background");
+//     document.querySelector(".message input").classList.toggle("teal-background");
+//     document.querySelector(".message input").classList.toggle("light-text");
+
+//     document.querySelector(".modal").classList.toggle("teal-background");
+
+//     // ✅ Toggle Light/Night Mode for Table Header & Borders
+//     document.querySelector(".tasks-table-container").classList.toggle("night-mode");
+//     document.querySelector(".tasks-table").classList.toggle("night-mode");
+
+//     // ✅ Toggle Light/Night Mode for "Sort By" Label
+//     document.querySelector("label[for='sortTasks']").classList.toggle("night-mode");
+
+//     console.log("Light mode toggled successfully!");
+// }
+
+
 const mode = document.querySelector(".icon");
 mode.onclick = changeMode;
 
-function changeMode(){
+function changeMode() {
+    document.querySelector("#tasksContent").classList.toggle("light-background");
+    document.querySelector(".tasks-table-container").classList.toggle("light-background");
+    document.querySelector(".tasks-header").classList.toggle("light-background");
+    document.querySelector("#sortTasks").classList.toggle("light-text");
+    document.querySelector(".new-task-btn").classList.toggle("light-background");
+
+    document.querySelector(".tasks-table").classList.toggle("light-background");
+    document.querySelector(".tasks-table-container").classList.toggle("light-background");
+
+    document.querySelectorAll(".tasks-table th").forEach(element => {
+        element.classList.toggle("light-background");
+        element.classList.toggle("dark-text");
+    });
+
+    document.querySelectorAll(".tasks-table td").forEach(element => {
+        element.classList.toggle("dark-text");
+    });
+
+    document.querySelectorAll(".tasks-table tbody tr:nth-child(even)").forEach(element => {
+        element.classList.toggle("light-background");
+    });
+
+    document.querySelectorAll(".tasks-table tbody tr:hover").forEach(element => {
+        element.classList.toggle("light-background");
+    });
+
+    document.querySelectorAll(".status").forEach(element => {
+        element.classList.toggle("dark-text");
+    });
+
     document.querySelector("header").classList.toggle("light-background");
     document.querySelector("aside").classList.toggle("light-background");
     document.querySelector("main").classList.toggle("light-background");
     document.querySelector("#myChart").classList.toggle("light-background");
+
     document.querySelectorAll(".data-item").forEach(element => {
         element.classList.toggle("teal-background");
-    })
+    });
+
     document.querySelectorAll(".menu-item").forEach(element => {
         element.classList.toggle("teal-background");
-    })
+    });
+
     document.querySelectorAll(".menu-item").forEach(element => {
         element.classList.toggle("blue-background");
-    })
+    });
+
     document.querySelectorAll(".project-grid div").forEach(element => { 
         element.classList.toggle("teal-background");
-    })
+    });
+
     document.querySelectorAll(".student").forEach(element => {
         element.classList.toggle("teal-background");
-    })
+    });
+
     document.querySelectorAll(".modal input").forEach(element => { 
-        element.classList.toggle("teal-background");
-    })
+        element.classList.toggle("light-background");
+    });
+
     document.querySelectorAll(".modal select").forEach(element => { 
-        element.classList.toggle("teal-background");
-    })
+        element.classList.toggle("light-background");
+    });
+
+    document.querySelectorAll(".modal textarea").forEach(element => { 
+        element.classList.toggle("light-background");
+    });
+
     document.querySelector("header div p").classList.toggle("dark-text");
     document.querySelector("#datetime").classList.toggle("dark-text");
+
     document.querySelector(".project-controls input").classList.toggle("teal-background");
     document.querySelector(".project-controls input").classList.toggle("light-text");
+
     document.querySelector(".project-controls select").classList.toggle("teal-background");
+
     document.querySelector(".chat-part").classList.toggle("teal-background");
     document.querySelector(".message input").classList.toggle("teal-background");
     document.querySelector(".message input").classList.toggle("light-text");
-    document.querySelector(".modal").classList.toggle("teal-background");
-    document.querySelector(".modal textarea").classList.toggle("teal-background");
-    
-    
+
+    document.querySelector(".modal").classList.toggle("light-background");
+
+    // ✅ Toggle Light/Night Mode for Table Header & Borders
+    document.querySelector(".tasks-table-container").classList.toggle("night-mode");
+    document.querySelector(".tasks-table").classList.toggle("night-mode");
+
+    // ✅ Toggle Light/Night Mode for "Sort By" Label
+    document.querySelector("label[for='sortTasks']").classList.toggle("night-mode");
+
+    console.log("Light mode toggled successfully!");
 }
 
+
 /////////////////////////////////////*** ✅ add night mode//////////////////////////////////
+
+
+
+
+
+
 
 
 /////////////////////////////////////*** ✅ add admin span name//////////////////////////////////
