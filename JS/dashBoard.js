@@ -310,106 +310,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /////////////////////////////////////*** ✅ add night mode//////////////////////////////////
 
-
-
-
-
-// const mode = document.querySelector(".icon");
-// mode.onclick = changeMode;
-
-// function changeMode() {
-//     document.querySelector("#tasksContent").classList.toggle("light-background");
-//     document.querySelector(".tasks-table-container").classList.toggle("light-background");
-//     document.querySelector(".tasks-header").classList.toggle("light-background");
-//     document.querySelector("#sortTasks").classList.toggle("light-text");
-//     document.querySelector(".new-task-btn").classList.toggle("light-background");
-
-//     document.querySelector(".tasks-table").classList.toggle("light-background");
-//     document.querySelector(".tasks-table-container").classList.toggle("light-background");
-
-//     document.querySelectorAll(".tasks-table th").forEach(element => {
-//         element.classList.toggle("light-background");
-//         element.classList.toggle("dark-text");
-//     });
-
-//     document.querySelectorAll(".tasks-table td").forEach(element => {
-//         element.classList.toggle("dark-text");
-//     });
-
-//     document.querySelectorAll(".tasks-table tbody tr:nth-child(even)").forEach(element => {
-//         element.classList.toggle("light-background");
-//     });
-
-//     document.querySelectorAll(".tasks-table tbody tr:hover").forEach(element => {
-//         element.classList.toggle("light-background");
-//     });
-
-//     document.querySelectorAll(".status").forEach(element => {
-//         element.classList.toggle("dark-text");
-//     });
-
-//     document.querySelector("header").classList.toggle("light-background");
-//     document.querySelector("aside").classList.toggle("light-background");
-//     document.querySelector("main").classList.toggle("light-background");
-//     document.querySelector("#myChart").classList.toggle("light-background");
-
-//     document.querySelectorAll(".data-item").forEach(element => {
-//         element.classList.toggle("teal-background");
-//     });
-
-//     document.querySelectorAll(".menu-item").forEach(element => {
-//         element.classList.toggle("teal-background");
-//     });
-
-//     document.querySelectorAll(".menu-item").forEach(element => {
-//         element.classList.toggle("blue-background");
-//     });
-
-//     document.querySelectorAll(".project-grid div").forEach(element => { 
-//         element.classList.toggle("teal-background");
-//     });
-
-//     document.querySelectorAll(".student").forEach(element => {
-//         element.classList.toggle("teal-background");
-//     });
-
-//     document.querySelectorAll(".modal input").forEach(element => { 
-//         element.classList.toggle("teal-background");
-//     });
-
-//     document.querySelectorAll(".modal select").forEach(element => { 
-//         element.classList.toggle("teal-background");
-//     });
-
-//     document.querySelectorAll(".modal textarea").forEach(element => { 
-//         element.classList.toggle("teal-background");
-//     });
-
-//     document.querySelector("header div p").classList.toggle("dark-text");
-//     document.querySelector("#datetime").classList.toggle("dark-text");
-
-//     document.querySelector(".project-controls input").classList.toggle("teal-background");
-//     document.querySelector(".project-controls input").classList.toggle("light-text");
-
-//     document.querySelector(".project-controls select").classList.toggle("teal-background");
-
-//     document.querySelector(".chat-part").classList.toggle("teal-background");
-//     document.querySelector(".message input").classList.toggle("teal-background");
-//     document.querySelector(".message input").classList.toggle("light-text");
-
-//     document.querySelector(".modal").classList.toggle("teal-background");
-
-//     // ✅ Toggle Light/Night Mode for Table Header & Borders
-//     document.querySelector(".tasks-table-container").classList.toggle("night-mode");
-//     document.querySelector(".tasks-table").classList.toggle("night-mode");
-
-//     // ✅ Toggle Light/Night Mode for "Sort By" Label
-//     document.querySelector("label[for='sortTasks']").classList.toggle("night-mode");
-
-//     console.log("Light mode toggled successfully!");
-// }
-
-
 const mode = document.querySelector(".icon");
 mode.onclick = changeMode;
 
@@ -759,5 +659,46 @@ document.addEventListener("DOMContentLoaded", function () {
 /////////////////////////////////////*** ✅  project tab ///////////////////////
 
 
+
+
+// Function to show/hide loader
+function toggleLoader(show) {
+    const loader = document.getElementById("loader");
+    loader.style.display = show ? "block" : "none";
+}
+
+// Modify Task Form Submission to Show Loader
+taskForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    // Show loader
+    toggleLoader(true);
+
+    setTimeout(() => {
+        // Get input values
+        const project = document.getElementById("project").value;
+        const taskName = document.getElementById("taskName").value;
+        const description = document.getElementById("description").value;
+        const assignedStudent = document.getElementById("assignedStudent").value;
+        const status = document.getElementById("status").value;
+        const dueDate = document.getElementById("dueDate").value;
+
+        let tasks = getTasksFromStorage();
+        let lastTaskId = tasks.length ? Math.max(...tasks.map(task => task.id)) : 0;
+        const newTaskId = lastTaskId + 1;
+
+        const newTask = { id: newTaskId, project, taskName, description, assignedStudent, status, dueDate };
+        tasks.push(newTask);
+        saveTasksToStorage(tasks);
+        addTaskToTable(newTask);
+
+        // Hide loader after operation is complete
+        toggleLoader(false);
+
+        // Reset the form & close modal
+        taskForm.reset();
+        toggleModal(false);
+    }, 1000); // Simulate network delay
+});
 
 
