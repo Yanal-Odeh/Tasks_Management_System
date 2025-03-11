@@ -150,7 +150,43 @@ document.addEventListener("DOMContentLoaded", function () {
     const taskForm = document.getElementById("taskForm");
     const tableBody = document.querySelector(".tasks-table tbody");
     const sortSelect = document.getElementById("sortTasks");
+    const assignedStudentSelect = document.getElementById("assignedStudent");
+    const projectSelect = document.getElementById("project");
 
+
+    // Retrieve users from localStorage
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    // Retrieve projects from localStorage
+    const projects = JSON.parse(localStorage.getItem("projects")) || [];
+
+    // Filter only students
+    const students = users.filter(user => user.role === "Student");
+
+    // Populate the students dropdown list dynamically
+    if (students.length > 0) {
+        assignedStudentSelect.innerHTML = '<option selected disabled value="">Select a student</option>'; // Clear existing options
+        students.forEach(student => {
+            const option = document.createElement("option");
+            option.textContent = student.username;
+            option.value = student.username;
+            assignedStudentSelect.appendChild(option);
+        });
+    } else {
+        assignedStudentSelect.innerHTML = '<option>No students registered</option>';
+    }
+
+    // Populate the projects dropdown list dynamically
+    if (projects.length > 0) {
+        projectSelect.innerHTML = '<option selected disabled value="">Select a project</option>'; // Clear existing options
+        projects.forEach(project => {
+            const option = document.createElement("option");
+            option.textContent = project.title;
+            option.value = project.title;
+            projectSelect.appendChild(option);
+        });
+    } else {
+        projectSelect.innerHTML = '<option>No projects registered</option>';
+    }
     // Load tasks from Local Storage on page load
     loadTasksFromStorage();
 
@@ -343,32 +379,36 @@ function changeMode(){
 
 /////////////////////////////////////*** ✅ add admin span name//////////////////////////////////
 document.addEventListener("DOMContentLoaded", () => {
-    // Get admin details from sessionStorage or localStorage
-    const adminData = sessionStorage.getItem("currentAdmin") || localStorage.getItem("currentAdmin");
+    // Get current user details from sessionStorage or localStorage
+    const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
 
-    if (!adminData) {
-        // If no admin is logged in, redirect to the sign-in page
+    if (!userData) {
+        // If no user is logged in, redirect to the sign-in page
         window.location.assign("../Signin.html"); // Adjust the path as needed
         return;
     }
 
-    // Parse admin data
-    const admin = JSON.parse(adminData);
+    // Parse user data
+    const user = JSON.parse(userData);
 
-    // Select the admin name element and update it dynamically
-    const adminNameSpan = document.querySelector(".header-top span");
-    if (adminNameSpan) {
-        adminNameSpan.textContent = admin.userName; // Display logged-in admin's username
+    // Select the user name element and update it dynamically
+    const userNameSpan = document.querySelector(".header-top span");
+    if (userNameSpan) {
+        userNameSpan.textContent = `${user.role}: ${user.username}`; // Example: "Student: JohnDoe" or "Admin: AdminUser"
     }
 
     // Handle logout button click
     const logoutBtn = document.querySelector(".logout-btn");
-    logoutBtn.addEventListener("click", () => {
-        sessionStorage.removeItem("currentAdmin");
-        localStorage.removeItem("currentAdmin"); // Clears persistent login too
-        window.location.assign("../Signin.html"); // Redirect to sign-in page
-    });
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            sessionStorage.removeItem("session");
+            localStorage.removeItem("session"); // Clears persistent login too
+            window.location.assign("../Signin.html"); // Redirect to sign-in page
+        });
+    }
 });
+
+
 
 /////////////////////////////////////*** ✅ add admin span name//////////////////////////////////
 
@@ -413,6 +453,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeModalBtn = document.querySelector(".modal .close");
     const projectSearch = document.getElementById("projectSearch");
     const projectStatusFilter = document.getElementById("projectStatusFilter");
+    const studentsList = document.getElementById("studentsList");
+   
+
+    // Retrieve users from localStorage
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+
+    // Filter only students
+    const students = users.filter(user => user.role === "Student");
+
+    // Populate the students dropdown list
+    if (students.length > 0) {
+        studentsList.innerHTML = ""; // Clear existing options
+        students.forEach(student => {
+            const option = document.createElement("option");
+            option.textContent = student.username;
+            option.value = student.username;
+            studentsList.appendChild(option);
+        });
+    } else {
+        studentsList.innerHTML = "<option>No students registered</option>";
+    }
+    
 
     // Load projects from localStorage or use default sample projects
     let projects = JSON.parse(localStorage.getItem("projects")) || [
@@ -583,6 +645,85 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /////////////////////////////////////*** ✅  project tab ///////////////////////
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const projectCards = document.querySelectorAll(".project-card");
+    
+    // Create the details panel dynamically and append it to the body
+    const detailsPanel = document.createElement("div");
+    detailsPanel.classList.add("details-panel");
+    document.body.appendChild(detailsPanel);
+
+    // Close button (X)
+    const closeButton = document.createElement("span");
+    closeButton.innerHTML = "&times;";
+    closeButton.classList.add("close-button");
+
+    // Event listener to hide the details panel when clicking the close button
+    closeButton.addEventListener("click", function () {
+        detailsPanel.style.display = "none"; // Hide the panel
+    });
+
+    // Ensure close button is always inside the details panel
+    detailsPanel.appendChild(closeButton);
+
+    projectCards.forEach(card => {
+        card.addEventListener("click", function () {
+            const projectTitle = card.querySelector("h3").textContent.trim();
+            displayProjectDetails(projectTitle);
+        });
+    });
+
+    function displayProjectDetails(projectTitle) {
+        const projects = JSON.parse(localStorage.getItem("projects")) || [];
+        const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+        // Find the selected project
+        const project = projects.find(proj => proj.title === projectTitle);
+        if (!project) return;
+
+        // Filter tasks related to the project
+        const relatedTasks = tasks.filter(task => task.project === projectTitle);
+
+        // Clear previous content but keep the close button
+        detailsPanel.textContent = "";
+        detailsPanel.appendChild(closeButton); // Keep close button at the top
+
+        // Generate HTML for project details
+        let detailsHTML = `
+            <h2>${project.title}</h2>
+            <p><strong>Description:</strong> ${project.description}</p>
+            <p><strong>Category:</strong> ${project.category}</p>
+            <p><strong>Students:</strong> ${project.students.join(", ")}</p>
+            <p><strong>Start Date:</strong> ${project.startDate}</p>
+            <p><strong>End Date:</strong> ${project.endDate}</p>
+            <h3>Tasks</h3>
+        `;
+
+        // Append task details
+        if (relatedTasks.length > 0) {
+            relatedTasks.forEach(task => {
+                detailsHTML += `
+                    <div class="task-card">
+                        <p><strong>Task ID:</strong> ${task.id}</p>
+                        <p><strong>Task Name:</strong> ${task.taskName}</p>
+                        <p><strong>Description:</strong> ${task.description}</p>
+                        <p><strong>Assigned Student:</strong> ${task.assignedStudent}</p>
+                        <p><strong>Status:</strong> ${task.status}</p>
+                    </div>
+                `;
+            });
+        } else {
+            detailsHTML += `<p>No tasks found for this project.</p>`;
+        }
+
+        // Append the new content **AFTER** the close button
+        detailsPanel.insertAdjacentHTML("beforeend", detailsHTML);
+        detailsPanel.style.display = "block"; // Show details panel
+    }
+});
+
 
 
 

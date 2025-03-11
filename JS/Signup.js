@@ -1,70 +1,62 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // Fetch users from localStorage or initialize as an empty array
-  let users = JSON.parse(localStorage.getItem("users")) || [];
+document.addEventListener("DOMContentLoaded", function () {
+    const studentCheckbox = document.getElementById("student");
+    const universityIdGroup = document.getElementById("university-id-group");
+    const signupForm = document.getElementById("signup-form");
 
-  // Select the sign-up form and input fields
-  const signUpForm = document.getElementById("signup-form");
-  const userNameInput = document.getElementById("username");
-  const passwordInput = document.getElementById("password");
-  const studentCheckbox = document.getElementById("student");
-  const universityIdGroup = document.getElementById("university-id-group");
-  const universityIdInput = document.getElementById("university-id");
+    // Show or hide university ID field based on checkbox state
+    studentCheckbox.addEventListener("change", function () {
+        universityIdGroup.style.display = studentCheckbox.checked ? "block" : "none";
+    });
 
-  // Toggle University ID field based on student checkbox
-  studentCheckbox.addEventListener("change", () => {
-      universityIdGroup.style.display = studentCheckbox.checked ? "block" : "none";
-  });
+    // Handle form submission
+    signupForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent page reload
 
-  // Handle form submission
-  signUpForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+        const isStudent = studentCheckbox.checked;
+        const universityId = document.getElementById("university-id").value.trim();
 
-      // Get values from input fields
-      const userName = userNameInput.value.trim();
-      const password = passwordInput.value.trim();
-      const isStudent = studentCheckbox.checked;
-      const universityId = isStudent ? universityIdInput.value.trim() : null;
+        // Retrieve existing users or initialize an empty array
+        let users = JSON.parse(localStorage.getItem("users")) || [];
 
-      // Validate input fields
-      if (!userName || !password || (isStudent && !universityId)) {
-          showError("All required fields must be filled out.");
-          return;
-      }
+        // Check if username already exists
+        const existingUser = users.find(user => user.username.toLowerCase() === username.toLowerCase());
+        if (existingUser) {
+            alert("Username already exists! Please choose a different username.");
+            return;
+        }
 
-      // Check if username already exists
-      const userExists = users.some(user => user.userName === userName);
-      if (userExists) {
-          showError("Username already exists. Choose a different one.");
-          return;
-      }
+        // If the user is a student, ensure the university ID is unique
+        if (isStudent) {
+            const existingUniId = users.find(user => user.universityId === universityId);
+            if (existingUniId) {
+                alert("University ID already exists! Please enter a unique university ID.");
+                return;
+            }
 
-      // Hash the password using bcrypt.js
-      const hashedPassword = await hashPassword(password);
+            if (!universityId) {
+                alert("University ID is required for students.");
+                return;
+            }
+        }
 
-      // Create new user object
-      const newUser = {
-          userName: userName,
-          userPassword: hashedPassword, // Hashed password
-          isStudent: isStudent,
-          universityId: universityId || null, // Store university ID if applicable
-      };
+        // Create new user object
+        const newUser = {
+            username: username,
+            password: password, // ⚠️ Storing plain text passwords is not secure in real applications
+            role: isStudent ? "Student" : "Admin",
+            universityId: isStudent ? universityId : null
+        };
 
-      // Save the new user to localStorage
-      users.push(newUser);
-      localStorage.setItem("users", JSON.stringify(users));
+        // Add the new user to the users array
+        users.push(newUser);
 
-      // Redirect to login page
-      window.location.assign("../HTML/userLogin.html");
-  });
+        // Save updated users list to local storage
+        localStorage.setItem("users", JSON.stringify(users));
 
-  // Function to hash password using bcrypt.js
-  async function hashPassword(password) {
-      const saltRounds = 10;
-      return await bcrypt.hash(password, saltRounds);
-  }
-
-  // Function to show error messages
-  function showError(message) {
-      alert(message); // Can be improved to display errors dynamically in UI
-  }
+        alert("Sign-up successful! User data saved.");
+        signupForm.reset();
+        universityIdGroup.style.display = "none"; // Hide university ID field after submission
+    });
 });

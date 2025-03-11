@@ -1,51 +1,40 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Hardcoded admin credentials (for security, consider hashing passwords)
-    const admins = [
-        { userName: "admin1", password: "AdminPass123" },
-        { userName: "admin2", password: "SecurePass456" },
-        {userName: "Ali", password: "1234"}
-    ];
+document.addEventListener("DOMContentLoaded", function () {
+    const signinForm = document.getElementById("signin-form");
 
-    // Select the sign-in form and input fields
-    const adminSignInForm = document.getElementById("signin-form");
-    const adminUserNameInput = document.getElementById("username");
-    const adminPasswordInput = document.getElementById("password");
-    const staySignedInCheckbox = document.getElementById("stay-signed-in");
+    signinForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent page reload
 
-    // Handle form submission
-    adminSignInForm.addEventListener("submit", (event) => {
-        event.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const staySignedIn = document.getElementById("stay-signed-in").checked;
 
-        // Get input values
-        const userName = adminUserNameInput.value.trim();
-        const password = adminPasswordInput.value.trim();
+        // Retrieve users from local storage
+        const users = JSON.parse(localStorage.getItem("users")) || [];
 
-        // Validate input fields
-        if (!userName || !password) {
-            showError("Please enter both username and password.");
+        // Find the user with the entered username and password
+        const storedUser = users.find(user => user.username === username && user.password === password);
+
+        if (!storedUser) {
+            alert("Invalid username or password. Please try again.");
             return;
         }
 
-        // Check if the provided credentials match an admin
-        const admin = admins.find(admin => admin.userName === userName && admin.password === password);
-        if (!admin) {
-            showError("Invalid username or password.");
-            return;
-        }
+        alert(`Sign-in successful! Welcome, ${storedUser.role}.`);
 
-        // Store admin login session
-        if (staySignedInCheckbox.checked) {
-            localStorage.setItem("currentAdmin", JSON.stringify(admin)); // Persistent login
+        // Store session data
+        const sessionData = { username: storedUser.username, role: storedUser.role };
+
+        if (staySignedIn) {
+            localStorage.setItem("session", JSON.stringify(sessionData));
         } else {
-            sessionStorage.setItem("currentAdmin", JSON.stringify(admin)); // Session-only login
+            sessionStorage.setItem("session", JSON.stringify(sessionData));
         }
 
-        // Redirect to the admin dashboard
-        window.location.assign("../DashBoard.html"); // Change this to your actual admin dashboard page
+        // Redirect based on role
+        if (storedUser.role === "Student") {
+            window.location.href = "DashBoard.html"; // Redirect to student dashboard
+        } else {
+            window.location.href = "DashBoard.html"; // Redirect to admin dashboard
+        }
     });
-
-    // Function to show error messages dynamically
-    function showError(message) {
-        alert(message); // Can be replaced with a UI error message display
-    }
 });
