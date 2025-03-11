@@ -31,6 +31,7 @@
 
 
     <div class="main-container">
+        
         <aside>
             <button type="button" class="menu-toggle">&#9776;</button> <!-- Hamburger Menu -->
             
@@ -150,8 +151,13 @@
                         <option value="assigned-student">Assigned Student</option>
                     </select>
                 </div>
-
-            <button type="button" class="new-task-btn">Create a New Task</button>
+                
+                <div class="task-buttom">
+                 <button type="button" class="edit-task-btn" disabled> Edit Task</button>    
+                 <button type="button" class="delete-task-btn" disabled>Delete Task </button>    
+                 <button type="button" class="new-task-btn">Create a New Task</button>
+                </div>
+                
                     <!-- Task Creation Modal -->
             <div id="taskModal" class="modal">
     <span class="close">&times;</span>
@@ -229,51 +235,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                         <tr>
-                            <td>1</td>
-                            <td>Website Redesign</td>
-                            <td>Design Homepage</td>
-                            <td>Create a responsive design for the homepage.</td>
-                            <td>Ali Yaseen</td>
-                            <td class="status in-progress">In Progress</td>
-                            <td>4/22/2023</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Website Redesign</td>
-                            <td>Develop API</td>
-                            <td>Set up the backend API for the project.</td>
-                            <td>Braa Aeesh</td>
-                            <td class="status completed">Completed</td>
-                            <td>2023-01-05 </td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Mobile App Development</td>
-                            <td>Write Documentation</td>
-                            <td>Document the project setup and usage.</td>
-                            <td>Ibn Al-Jawzee</td>
-                            <td class="status pending">Pending</td>
-                            <td>2021-01-05</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Mobile App Development</td>
-                            <td>Testing</td>
-                            <td>Conduct testing for all features.</td>
-                            <td>Ibn Malik</td>
-                            <td class="status in-progress">In Progress</td>
-                            <td>2019-01-05</td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>E-commerce Platform</td>
-                            <td>Deploy Application</td>
-                            <td>Deploy the application to the production server.</td>
-                            <td>Ayman Outom</td>
-                            <td class="status pending">Pending</td>
-                            <td>2021-03-24</td>
-                        </tr> 
+                        <!-- Dynamic Tasks Will Be Inserted Here -->
                     </tbody>
                 </table>
             </div>
@@ -283,29 +245,29 @@
         <!-- four     -->
             <div id="chatContent" class="content-section">
                 <div class="chat-container">
-                <div class="stud-part">
-                <h2>List of Students</h2>
-                <div class="students">
-                    <div class="student"><p>Ali Yaseen</p></div>
-                    <div class="student"><p>bara Aeesh</p></div>
-                    <div class="student"><p>Ibn Al-Jawzee</p></div>
-                    <div class="student"><p>Ibn Malik</p></div>
-                    <div class="student"><p>Ayman Outom</p></div>
-                    <div class="student"><p>Salah Salah</p></div>
-                    <div class="student"><p>Yahya Leader</p></div>
-                    <div class="student"><p>Salam Kareem</p></div>
-                    <div class="student"><p>Issac Nasir</p></div>
-                    <div class="student"><p>Saeed Salam</p></div>
+                    <div class="stud-part">
+                            <h2>List of Students</h2>
+                            <div class="students">
+                                <div class="student"><p>Ali Yaseen</p></div>
+                                <div class="student"><p>bara Aeesh</p></div>
+                                <div class="student"><p>Ibn Al-Jawzee</p></div>
+                                <div class="student"><p>Ibn Malik</p></div>
+                                <div class="student"><p>Ayman Outom</p></div>
+                                <div class="student"><p>Salah Salah</p></div>
+                                <div class="student"><p>Yahya Leader</p></div>
+                                <div class="student"><p>Salam Kareem</p></div>
+                                <div class="student"><p>Issac Nasir</p></div>
+                                <div class="student"><p>Saeed Salam</p></div>
+                        </div>
+                    </div>
+                            <div class="chat-part">
+                            <p class="left-margin">Chatting with Ali Yaseen...</p>
+                            <p class="msg">Salam Alykoum</p>
+                            <div class="message">
+                            <input type="text" class="left-margin" placeholder="Type your message...">
+                            <input type="submit" value="Send">
                 </div>
-            </div>
-            <div class="chat-part">
-                <p class="left-margin">Chatting with Ali Yaseen...</p>
-                <p class="msg">Salam Alykoum</p>
-             <div class="message">
-                <input type="text" class="left-margin" placeholder="Type your message...">
-                <input type="submit" value="Send">
-             </div>
-            </div>
+                        </div>
         </div>
 
 

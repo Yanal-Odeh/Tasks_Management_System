@@ -59,6 +59,10 @@
 ///////////////////////////////////////////aside///////////////////////////////////////////////
 
 
+
+
+
+
 /////////////////////////////////////////////time//////////////////////////////////////////////
 
 // Function to update date & time dynamically
@@ -84,6 +88,9 @@ setInterval(updateDateTime, 1000);
 updateDateTime();
 
 /////////////////////////////////////////////time//////////////////////////////////////////////
+
+
+
 
 
 
@@ -136,6 +143,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 /////////////////////////////////////////////chart.js//////////////////////////////////////////////
+
+
 
 
 
@@ -244,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function () {
         toggleModal(false);
     });
 
-    // ✅ Sorting Functionality (Preserves Table Instead of Clearing It)
+    // ✅ Sorting Functionality (Sort & Reassign Task IDs)
     sortSelect.addEventListener("change", function () {
         const sortBy = this.value;
         let tasks = getTasksFromStorage();
@@ -264,12 +273,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 break;
         }
 
-        // Save sorted tasks & reload table without clearing it
+        // Reassign task IDs after sorting to maintain sequential order
+        tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
+
+        // Save sorted tasks & reload table
         saveTasksToStorage(tasks);
         refreshTaskTable(tasks);
     });
 
-    // ✅ Sorting Functions
+    // ✅ Sorting Functions (Maintains Task Order & Reassigns IDs)
     function sortByStatus(tasks) {
         return tasks.sort((a, b) => a.status.localeCompare(b.status));
     }
@@ -309,10 +321,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ Refresh Task Table Without Clearing Everything
     function refreshTaskTable(tasks) {
-        const currentTasks = Array.from(tableBody.children);
-        currentTasks.forEach(row => tableBody.removeChild(row)); // Remove rows without clearing storage
-
-        tasks.forEach(addTaskToTable); // Append new order without resetting
+        tableBody.innerHTML = ""; // Clear the table body only (not local storage)
+        tasks.forEach(addTaskToTable);
     }
 
     // ✅ Get Tasks from Local Storage
@@ -326,55 +336,118 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+
 /////////////////////////////////////✅ Task Modal Handling + sorting//////////////////////////////////
 
 
 
+
+
+
 /////////////////////////////////////*** ✅ add night mode//////////////////////////////////
+
 const mode = document.querySelector(".icon");
 mode.onclick = changeMode;
 
-function changeMode(){
+function changeMode() {
+    document.querySelector("#tasksContent").classList.toggle("light-background");
+    document.querySelector(".tasks-table-container").classList.toggle("light-background");
+    document.querySelector(".tasks-header").classList.toggle("light-background");
+    document.querySelector("#sortTasks").classList.toggle("light-text");
+    document.querySelector(".new-task-btn").classList.toggle("light-background");
+
+    document.querySelector(".tasks-table").classList.toggle("light-background");
+    document.querySelector(".tasks-table-container").classList.toggle("light-background");
+
+    document.querySelectorAll(".tasks-table th").forEach(element => {
+        element.classList.toggle("light-background");
+        element.classList.toggle("dark-text");
+    });
+
+    document.querySelectorAll(".tasks-table td").forEach(element => {
+        element.classList.toggle("dark-text");
+    });
+
+    document.querySelectorAll(".tasks-table tbody tr:nth-child(even)").forEach(element => {
+        element.classList.toggle("light-background");
+    });
+
+    document.querySelectorAll(".tasks-table tbody tr:hover").forEach(element => {
+        element.classList.toggle("light-background");
+    });
+
+    document.querySelectorAll(".status").forEach(element => {
+        element.classList.toggle("dark-text");
+    });
+
     document.querySelector("header").classList.toggle("light-background");
     document.querySelector("aside").classList.toggle("light-background");
     document.querySelector("main").classList.toggle("light-background");
     document.querySelector("#myChart").classList.toggle("light-background");
+
     document.querySelectorAll(".data-item").forEach(element => {
         element.classList.toggle("teal-background");
-    })
+    });
+
     document.querySelectorAll(".menu-item").forEach(element => {
         element.classList.toggle("teal-background");
-    })
+    });
+
     document.querySelectorAll(".menu-item").forEach(element => {
         element.classList.toggle("blue-background");
-    })
+    });
+
     document.querySelectorAll(".project-grid div").forEach(element => { 
         element.classList.toggle("teal-background");
-    })
+    });
+
     document.querySelectorAll(".student").forEach(element => {
         element.classList.toggle("teal-background");
-    })
+    });
+
     document.querySelectorAll(".modal input").forEach(element => { 
-        element.classList.toggle("teal-background");
-    })
+        element.classList.toggle("light-background");
+    });
+
     document.querySelectorAll(".modal select").forEach(element => { 
-        element.classList.toggle("teal-background");
-    })
+        element.classList.toggle("light-background");
+    });
+
+    document.querySelectorAll(".modal textarea").forEach(element => { 
+        element.classList.toggle("light-background");
+    });
+
     document.querySelector("header div p").classList.toggle("dark-text");
     document.querySelector("#datetime").classList.toggle("dark-text");
+
     document.querySelector(".project-controls input").classList.toggle("teal-background");
     document.querySelector(".project-controls input").classList.toggle("light-text");
+
     document.querySelector(".project-controls select").classList.toggle("teal-background");
+
     document.querySelector(".chat-part").classList.toggle("teal-background");
     document.querySelector(".message input").classList.toggle("teal-background");
     document.querySelector(".message input").classList.toggle("light-text");
-    document.querySelector(".modal").classList.toggle("teal-background");
-    document.querySelector(".modal textarea").classList.toggle("teal-background");
-    
-    
+
+    document.querySelector(".modal").classList.toggle("light-background");
+
+    // ✅ Toggle Light/Night Mode for Table Header & Borders
+    document.querySelector(".tasks-table-container").classList.toggle("night-mode");
+    document.querySelector(".tasks-table").classList.toggle("night-mode");
+
+    // ✅ Toggle Light/Night Mode for "Sort By" Label
+    document.querySelector("label[for='sortTasks']").classList.toggle("night-mode");
+
 }
 
+
 /////////////////////////////////////*** ✅ add night mode//////////////////////////////////
+
+
+
+
+
+
 
 
 /////////////////////////////////////*** ✅ add admin span name//////////////////////////////////
@@ -728,3 +801,153 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+
+///////////////////////////////////// ✅ delete task ///////////////////////
+
+document.addEventListener("DOMContentLoaded", function () {
+    const tableBody = document.querySelector(".tasks-table tbody");
+    const deleteTaskBtn = document.querySelector(".delete-task-btn");
+
+    let selectedTask = null; // Stores the selected row for deletion
+
+    // ✅ Function to Select a Task Row on Left Click (Does Not Deselect)
+    tableBody.addEventListener("click", function (event) {
+        const row = event.target.closest("tr"); // Get the clicked row
+        if (!row || row === selectedTask) return; // Prevent reselecting the same row
+
+        // Remove previous selection
+        document.querySelectorAll(".tasks-table tbody tr").forEach(r => r.classList.remove("selected"));
+
+        // Highlight the selected row
+        row.classList.add("selected");
+        selectedTask = row;
+        deleteTaskBtn.removeAttribute("disabled"); // Enable delete button
+    });
+
+    // ✅ Function to Deselect a Task Row on Right Click ONLY
+    tableBody.addEventListener("contextmenu", function (event) {
+        event.preventDefault(); // Prevents the default right-click menu
+
+        // Remove selection
+        document.querySelectorAll(".tasks-table tbody tr").forEach(r => r.classList.remove("selected"));
+        selectedTask = null;
+
+        // Disable delete button if no row is selected
+        deleteTaskBtn.setAttribute("disabled", "true");
+    });
+
+    // ✅ Function to Delete a Selected Task and Reassign IDs
+    deleteTaskBtn.addEventListener("click", function () {
+        if (!selectedTask) return;
+
+        const confirmDelete = confirm("⚠️ Are you sure you want to delete this task?");
+        if (!confirmDelete) return;
+
+        const taskId = parseInt(selectedTask.cells[0].textContent); // Get Task ID
+
+        // Remove from UI
+        selectedTask.remove();
+
+        // Remove from Local Storage
+        let tasks = getTasksFromStorage();
+        tasks = tasks.filter(task => task.id !== taskId);
+
+        // Reassign task IDs starting from 1
+        tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
+
+        // Save updated task list
+        saveTasksToStorage(tasks);
+
+        // Refresh the table with updated IDs
+        loadTasksFromStorage();
+
+        // ✅ Auto-deselect after deleting (User must select a new row)
+        selectedTask = null;
+        deleteTaskBtn.setAttribute("disabled", "true");
+    });
+
+    // ✅ Function to Load Tasks from Local Storage and Reassign IDs
+    function loadTasksFromStorage() {
+        tableBody.innerHTML = ""; // Clear table before reloading
+
+        let tasks = getTasksFromStorage();
+
+        // Reassign task IDs starting from 1 (in case of missing IDs)
+        tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
+
+        // Save updated task list
+        saveTasksToStorage(tasks);
+
+        // Disable delete if no tasks exist
+        if (tasks.length === 0) {
+            deleteTaskBtn.setAttribute("disabled", "true");
+        }
+
+        tasks.forEach(addTaskToTable);
+    }
+
+    // ✅ Function to Add a Task to the Table
+    function addTaskToTable(task) {
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <td>${task.id}</td>
+            <td>${task.project}</td>
+            <td>${task.taskName}</td>
+            <td>${task.description}</td>
+            <td>${task.assignedStudent}</td>
+            <td class="status ${task.status.toLowerCase()}">${task.status}</td>
+            <td>${task.dueDate}</td>
+        `;
+        tableBody.appendChild(newRow);
+    }
+
+    // ✅ Get Tasks from Local Storage
+    function getTasksFromStorage() {
+        return JSON.parse(localStorage.getItem("tasks")) || [];
+    }
+
+    // ✅ Save Tasks to Local Storage
+    function saveTasksToStorage(tasks) {
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    // Load tasks on page load
+    loadTasksFromStorage();
+});
+
+///////////////////////////////////// ✅ delete task ///////////////////////
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("taskModal");
+    const modalOverlay = document.querySelector(".modal-overlay");
+    const openModalBtn = document.querySelector(".new-task-btn");
+    const closeModalBtn = document.querySelector(".modal .close");
+
+    // Function to open modal
+    function openModal() {
+        modal.classList.add("active");
+        modalOverlay.style.display = "block";
+        setTimeout(() => {
+            modal.style.opacity = "1";
+            modalOverlay.style.opacity = "1";
+        }, 10); // Delay for smooth fade-in effect
+    }
+
+    // Function to close modal
+    function closeModal() {
+        modal.style.opacity = "0";
+        modalOverlay.style.opacity = "0";
+        setTimeout(() => {
+            modal.classList.remove("active");
+            modalOverlay.style.display = "none";
+        }, 300); // Delay to match CSS transition
+    }
+
+    // Open modal when clicking the button
+    openModalBtn.addEventListener("click", openModal);
+
+    // Close modal when clicking the close button
+    closeModalBtn.addEventListener("click", closeModal);
+
+    // Close modal when clicking outside the modal (overlay)
+    modalOverlay.addEventListener("click", closeModal);
+});
