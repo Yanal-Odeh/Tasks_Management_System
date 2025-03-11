@@ -1,10 +1,3 @@
-*{
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-    text-decoration: none;
-    box-sizing: border-box;
-}
 
 .tasks-header {
     display: flex;
@@ -54,7 +47,7 @@
     gap: 0.5rem;
 }
 
-.new-task-btn,.delete-task-btn  {
+.new-task-btn,.delete-task-btn,.edit-task-btn{
     background-color: #007bff;
     color: white;
     font-size: 1rem;
@@ -66,7 +59,7 @@
     transition: all 0.3s ease;
 }
 
-.new-task-btn:hover,.delete-task-btn:hover {
+.new-task-btn:hover,.delete-task-btn:hover,.edit-task-btn:hover {
     background-color: #0056b3;
     transform: scale(1.05);
 }
@@ -74,12 +67,11 @@
 
 /* Highlight selected task row */
 .selected {
-    background-color: rgba(255, 0, 0, 0.2); /* Light red highlight */
-    border: 2px solid red;
+    background-color: rgba(255, 0, 0, 0.2); 
 }
 
 /* Disabled delete button styling */
-.delete-task-btn:disabled {
+.delete-task-btn:disabled,.edit-task-btn:disabled {
     background-color: grey;
     cursor: not-allowed;
 }
@@ -109,7 +101,6 @@
     background-color: #333;
     position: sticky;
     top: 0;
-    /* z-index: 10; */
 }
 
 .tasks-table th, .tasks-table td {
@@ -119,9 +110,9 @@
 }
 
 
-.tasks-table tbody tr:hover {
+/* .tasks-table tbody tr:hover {
     background-color: #333;
-}
+} */
 
 .status.completed {
     color: #28a745;
@@ -153,8 +144,9 @@ form #status:focus,form #assignedStudent:focus,form #project:focus{
     color:black;
 }
 
-
 .modal {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
     width: 50%;
     max-width: 600px;
     min-width: 300px;
@@ -242,6 +234,8 @@ form #status:focus,form #assignedStudent:focus,form #project:focus{
     background: rgba(0, 0, 0, 0.6); 
     z-index: 99; 
     display: none; 
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .modal.active {

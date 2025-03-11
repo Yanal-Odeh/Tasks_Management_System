@@ -775,3 +775,38 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 ///////////////////////////////////// ✅ delete task ///////////////////////
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("taskModal");
+    const modalOverlay = document.querySelector(".modal-overlay");
+    const openModalBtn = document.querySelector(".new-task-btn");
+    const closeModalBtn = document.querySelector(".modal .close");
+
+    // Function to open modal
+    function openModal() {
+        modal.classList.add("active");
+        modalOverlay.style.display = "block";
+        setTimeout(() => {
+            modal.style.opacity = "1";
+            modalOverlay.style.opacity = "1";
+        }, 10); // Delay for smooth fade-in effect
+    }
+
+    // Function to close modal
+    function closeModal() {
+        modal.style.opacity = "0";
+        modalOverlay.style.opacity = "0";
+        setTimeout(() => {
+            modal.classList.remove("active");
+            modalOverlay.style.display = "none";
+        }, 300); // Delay to match CSS transition
+    }
+
+    // Open modal when clicking the button
+    openModalBtn.addEventListener("click", openModal);
+
+    // Close modal when clicking the close button
+    closeModalBtn.addEventListener("click", closeModal);
+
+    // Close modal when clicking outside the modal (overlay)
+    modalOverlay.addEventListener("click", closeModal);
+});
