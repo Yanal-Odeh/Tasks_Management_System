@@ -89,58 +89,135 @@ updateDateTime();
 
 /////////////////////////////////////////////time//////////////////////////////////////////////
 
+document.addEventListener("DOMContentLoaded", function () {
+    // Get user data
+    const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
+    if (!userData) {
+        window.location.assign("../Signin.html"); // Redirect if not logged in
+        return;
+    }
+    
+    const user = JSON.parse(userData);
+    const isAdmin = user.role === "Admin";
+    
+    // Elements for dynamic count updates
+    const projectCountEl = document.querySelector(".data-item:nth-child(1) p");
+    const studentCountEl = document.querySelector(".data-item:nth-child(2)");
+    const taskCountEl = document.querySelector(".data-item:nth-child(3) p");
+    const finishedProjectCountEl = document.querySelector(".data-item:nth-child(4) p");
+    
+    // Get data from localStorage
+    let projects = JSON.parse(localStorage.getItem("projects")) || [];
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    
+    // Filter students only
+    let students = users.filter(user => user.role === "Student");
+    
+    // Filter finished projects
+    let finishedProjects = projects.filter(project => project.status.toLowerCase() === "completed");
+    
+    // Update dashboard stats dynamically
+    if (isAdmin) {
+        projectCountEl.textContent = projects.length;
+        studentCountEl.style.display = "block";
+        studentCountEl.querySelector("p").textContent = students.length;
+        taskCountEl.textContent = tasks.length;
+        finishedProjectCountEl.textContent = finishedProjects.length;
+    } else {
+        projectCountEl.textContent = projects.filter(project => project.students.includes(user.username)).length;
+        studentCountEl.style.display = "none"; // Hide student count for students
+        taskCountEl.textContent = tasks.filter(task => task.assignedStudent === user.username).length;
+        finishedProjectCountEl.textContent = finishedProjects.filter(project => project.students.includes(user.username)).length;
+    }
+});
 
 
 
 
 
 /////////////////////////////////////////////chart.js//////////////////////////////////////////////
-
 document.addEventListener("DOMContentLoaded", function () {
-    
+    // Retrieve user session
+    const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
+
+    if (!userData) {
+        window.location.assign("../Signin.html"); // Redirect if not logged in
+        return;
+    }
+
+    const user = JSON.parse(userData);
+    const isAdmin = user.role === "Admin";
+
+    // Retrieve data from localStorage
+    let projects = JSON.parse(localStorage.getItem("projects")) || [];
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    // For admin: Get total student count
+    let students = users.filter(user => user.role === "Student");
+
+    // For admin: Get completed projects
+    let finishedProjects = projects.filter(project => project.status.toLowerCase() === "completed");
+
+    let chartLabels, chartData;
+
+    if (isAdmin) {
+        // Admin sees everything
+        chartLabels = ["Number of Projects", "Number of Students", "Number of Tasks", "Number of Finished Projects"];
+        chartData = [projects.length, students.length, tasks.length, finishedProjects.length];
+    } else {
+        // Student sees only their assigned projects and tasks
+        let studentProjects = projects.filter(project => project.students.includes(user.username));
+        let studentTasks = tasks.filter(task => task.assignedStudent.toLowerCase() === user.username.toLowerCase());
+        let studentFinishedProjects = studentProjects.filter(project => project.status.toLowerCase() === "completed");
+
+        chartLabels = ["Number of Projects", "Number of Tasks", "Number of Finished Projects"];
+        chartData = [studentProjects.length, studentTasks.length, studentFinishedProjects.length];
+    }
+
     // Chart Data
-        const ctx = document.getElementById("myChart").getContext("2d");
-        new Chart(ctx, {
-            type: "bar",
-            data: {
-                labels: ["Number of Projects", "Number of Students", "Number of Tasks", "Number of Finished Projects"],
-                datasets: [{
-                    label: "Count",
-                    data: [5, 20, 10, 2],
-                    backgroundColor: [
-                        "rgba(47, 138, 230, 0.5)", 
-                        "rgba(216, 189, 39, 0.5)", 
-                        "rgba(139, 69, 19, 0.5)", 
-                        "rgba(128, 0, 128, 0.5)"
-                    ],
-                    
-                    borderColor: [
-                        "rgba(0, 100, 200, 1)", 
-                        "rgba(255, 215, 0, 1)", 
-                        "rgba(139, 69, 19, 1)", 
-                        "rgba(128, 0, 128, 1)"
-                    ],
-                    borderWidth: 1
-                }]
+    const ctx = document.getElementById("myChart").getContext("2d");
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: chartLabels, // Dynamic labels based on role
+            datasets: [{
+                label: "Count",
+                data: chartData, // Dynamic data based on role
+                backgroundColor: [
+                    "rgba(47, 138, 230, 0.5)", 
+                    "rgba(216, 189, 39, 0.5)", 
+                    "rgba(139, 69, 19, 0.5)", 
+                    "rgba(128, 0, 128, 0.5)"
+                ],
+                borderColor: [
+                    "rgba(0, 100, 200, 1)", 
+                    "rgba(255, 215, 0, 1)", 
+                    "rgba(139, 69, 19, 1)", 
+                    "rgba(128, 0, 128, 1)"
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true }
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: "#ddd" // Light gray legend text for dark background
-                        }
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#ddd" // Light gray legend text for dark background
                     }
                 }
             }
-        });
-    
-    
+        }
     });
+});
+
+
 
 /////////////////////////////////////////////chart.js//////////////////////////////////////////////
 
@@ -516,6 +593,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /////////////////////////////////////*** ✅ Project Modal Handling //////////////////////////////////
 
+
+
+
+
+
+
+
+
 /////////////////////////////////////*** ✅  project tab ///////////////////////
 document.addEventListener("DOMContentLoaded", function () {
     const projectContainer = document.getElementById("projectContainer");
@@ -720,88 +805,6 @@ document.addEventListener("DOMContentLoaded", function () {
 /////////////////////////////////////*** ✅  project tab ///////////////////////
 
 
-document.addEventListener("DOMContentLoaded", function () {
-    const projectCards = document.querySelectorAll(".project-card");
-    
-    // Create the details panel dynamically and append it to the body
-    const detailsPanel = document.createElement("div");
-    detailsPanel.classList.add("details-panel");
-    document.body.appendChild(detailsPanel);
-
-    // Close button (X)
-    const closeButton = document.createElement("span");
-    closeButton.innerHTML = "&times;";
-    closeButton.classList.add("close-button");
-
-    // Event listener to hide the details panel when clicking the close button
-    closeButton.addEventListener("click", function () {
-        detailsPanel.style.display = "none"; // Hide the panel
-    });
-
-    // Ensure close button is always inside the details panel
-    detailsPanel.appendChild(closeButton);
-
-    projectCards.forEach(card => {
-        card.addEventListener("click", function () {
-            const projectTitle = card.querySelector("h3").textContent.trim();
-            displayProjectDetails(projectTitle);
-        });
-    });
-
-    function displayProjectDetails(projectTitle) {
-        const projects = JSON.parse(localStorage.getItem("projects")) || [];
-        const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
-        // Find the selected project
-        const project = projects.find(proj => proj.title === projectTitle);
-        if (!project) return;
-
-        // Filter tasks related to the project
-        const relatedTasks = tasks.filter(task => task.project === projectTitle);
-
-        // Clear previous content but keep the close button
-        detailsPanel.textContent = "";
-        detailsPanel.appendChild(closeButton); // Keep close button at the top
-
-        // Generate HTML for project details
-        let detailsHTML = `
-            <h2>${project.title}</h2>
-            <p><strong>Description:</strong> ${project.description}</p>
-            <p><strong>Category:</strong> ${project.category}</p>
-            <p><strong>Students:</strong> ${project.students.join(", ")}</p>
-            <p><strong>Start Date:</strong> ${project.startDate}</p>
-            <p><strong>End Date:</strong> ${project.endDate}</p>
-            <h3>Tasks</h3>
-        `;
-
-        // Append task details
-        if (relatedTasks.length > 0) {
-            relatedTasks.forEach(task => {
-                detailsHTML += `
-                    <div class="task-card">
-                        <p><strong>Task ID:</strong> ${task.id}</p>
-                        <p><strong>Task Name:</strong> ${task.taskName}</p>
-                        <p><strong>Description:</strong> ${task.description}</p>
-                        <p><strong>Assigned Student:</strong> ${task.assignedStudent}</p>
-                        <p><strong>Status:</strong> ${task.status}</p>
-                    </div>
-                `;
-            });
-        } else {
-            detailsHTML += `<p>No tasks found for this project.</p>`;
-        }
-
-        // Append the new content **AFTER** the close button
-        detailsPanel.insertAdjacentHTML("beforeend", detailsHTML);
-        detailsPanel.style.display = "block"; // Show details panel
-    }
-});
-
-
-
-
-
-
 ///////////////////////////////////// ✅ delete task ///////////////////////
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -951,3 +954,194 @@ document.addEventListener("DOMContentLoaded", function () {
     // Close modal when clicking outside the modal (overlay)
     modalOverlay.addEventListener("click", closeModal);
 });
+
+
+
+
+
+///////////////////////////////////// ✅ sign is as a student ///////////////////////
+document.addEventListener("DOMContentLoaded", function () {
+    // Get logged-in user details
+    const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
+    if (!userData) {
+        window.location.assign("../Signin.html"); // Redirect if not logged in
+        return;
+    }
+    
+    const user = JSON.parse(userData);
+    const isAdmin = user.role === "Admin";
+    
+    // Hide "Add Project" button for students
+    const addProjectBtn = document.querySelector(".add-project-btn");
+    if (!isAdmin && addProjectBtn) {
+        addProjectBtn.style.display = "none";
+    }
+    
+    // Filter Projects by Assigned Students
+    function filterProjects() {
+        const projectContainer = document.getElementById("projectContainer");
+        let projects = JSON.parse(localStorage.getItem("projects")) || [];
+        
+        if (!isAdmin) {
+            projects = projects.filter(project => project.students.includes(user.username));
+        }
+        
+        renderProjects(projects);
+    }
+    
+    function renderProjects(filteredProjects) {
+        const projectContainer = document.getElementById("projectContainer");
+        projectContainer.innerHTML = "";
+        
+        filteredProjects.forEach((project, index) => {
+            const projectCard = document.createElement("div");
+            projectCard.classList.add("project-card");
+            projectCard.style.border = `2px solid ${project.borderColor}`;
+
+            projectCard.innerHTML = `
+                <h3 style="color:${project.borderColor}">${project.title}</h3>
+                <p><strong>Description:</strong> ${project.description}</p>
+                <p><strong>Students:</strong> ${project.students.join(", ")}</p>
+                <p><strong>Category:</strong> ${project.category}</p>
+                <p><strong>Status:</strong> ${project.status}</p>
+                <p>${project.startDate} - ${project.endDate}</p>
+            `;
+            
+            if (isAdmin) {
+                projectCard.innerHTML += `<button class="delete-project-btn" data-index="${index}">Delete</button>`;
+            }
+            
+            projectContainer.appendChild(projectCard);
+        });
+    }
+    
+    // Filter Tasks by Assigned Student
+    function filterTasks() {
+        const tableBody = document.querySelector(".tasks-table tbody");
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    
+        if (!isAdmin) {
+            // Ensure usernames are case-insensitive and match exactly
+            tasks = tasks.filter(task => task.assignedStudent.toLowerCase() === user.username.toLowerCase());
+        }
+    
+        renderTasks(tasks);
+    }
+    
+    
+    function renderTasks(filteredTasks) {
+        const tableBody = document.querySelector(".tasks-table tbody");
+        tableBody.innerHTML = ""; // Clear old tasks before rendering
+    
+        filteredTasks.forEach(task => {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td>${task.id}</td>
+                <td>${task.project}</td>
+                <td>${task.taskName}</td>
+                <td>${task.description}</td>
+                <td>${task.assignedStudent}</td>
+                <td class="status ${task.status.toLowerCase()}">${task.status}</td>
+                <td>${task.dueDate}</td>
+            `;
+            tableBody.appendChild(newRow);
+        });
+    }
+    
+    
+    
+    // Initial Filtering
+    filterProjects();
+    filterTasks();
+});
+
+
+
+///////////////////////////////////// ✅ sign is as a student ///////////////////////
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const projectCards = document.querySelectorAll(".project-card");
+    
+    // Create the details panel dynamically and append it to the body
+    const detailsPanel = document.createElement("div");
+    detailsPanel.classList.add("details-panel");
+    document.body.appendChild(detailsPanel);
+
+    // Close button (X)
+    const closeButton = document.createElement("span");
+    closeButton.innerHTML = "&times;";
+    closeButton.classList.add("close-button");
+
+    // Event listener to hide the details panel when clicking the close button
+    closeButton.addEventListener("click", function () {
+        detailsPanel.style.display = "none"; // Hide the panel
+    });
+
+    // Ensure close button is always inside the details panel
+    detailsPanel.appendChild(closeButton);
+
+    projectCards.forEach(card => {
+        card.addEventListener("click", function () {
+            const projectTitle = card.querySelector("h3").textContent.trim();
+            displayProjectDetails(projectTitle);
+        });
+    });
+
+    function displayProjectDetails(projectTitle) {
+        const projects = JSON.parse(localStorage.getItem("projects")) || [];
+        const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+        // Find the selected project
+        const project = projects.find(proj => proj.title === projectTitle);
+        if (!project) return;
+
+        // Filter tasks related to the project
+        const relatedTasks = tasks.filter(task => task.project === projectTitle);
+
+        // Clear previous content but keep the close button
+        detailsPanel.textContent = "";
+        detailsPanel.appendChild(closeButton); // Keep close button at the top
+
+        // Generate HTML for project details
+        let detailsHTML = `
+            <h2>${project.title}</h2>
+            <p><strong>Description:</strong> ${project.description}</p>
+            <p><strong>Category:</strong> ${project.category}</p>
+            <p><strong>Students:</strong> ${project.students.join(", ")}</p>
+            <p><strong>Start Date:</strong> ${project.startDate}</p>
+            <p><strong>End Date:</strong> ${project.endDate}</p>
+            <h3>Tasks</h3>
+        `;
+
+        // Append task details
+        if (relatedTasks.length > 0) {
+            relatedTasks.forEach(task => {
+                detailsHTML += `
+                    <div class="task-card">
+                        <p><strong>Task ID:</strong> ${task.id}</p>
+                        <p><strong>Task Name:</strong> ${task.taskName}</p>
+                        <p><strong>Description:</strong> ${task.description}</p>
+                        <p><strong>Assigned Student:</strong> ${task.assignedStudent}</p>
+                        <p><strong>Status:</strong> ${task.status}</p>
+                    </div>
+                `;
+            });
+        } else {
+            detailsHTML += `<p>No tasks found for this project.</p>`;
+        }
+
+        // Append the new content **AFTER** the close button
+        detailsPanel.insertAdjacentHTML("beforeend", detailsHTML);
+        detailsPanel.style.display = "block"; // Show details panel
+    }
+});
+
+
+
+
+
