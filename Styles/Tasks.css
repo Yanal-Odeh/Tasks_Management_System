@@ -446,3 +446,82 @@ form #status:focus,form #assignedStudent:focus,form #project:focus{
 
 
    
+
+#editTaskModal {
+    transition: opacity 0.3s ease-in-out;
+    width: 50%;
+    max-width: 600px;
+    min-width: 300px;
+    position: absolute;
+    z-index: 100;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgb(46, 45, 45);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#editTaskModal .close {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    color: gray;
+    cursor: pointer;
+}
+
+#editTaskModal .close:hover {
+    color: white;
+}
+
+#editTaskModal h2 {
+    color: rgb(35, 98, 200);
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+#editTaskModal label {
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+    font-weight: bold;
+    display: block;
+}
+
+#editTaskModal select,
+#editTaskModal input,
+#editTaskModal textarea {
+    width: 100%;
+    padding: 0.7rem;
+    font-size: 1.2rem;
+    background-color: #222;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 5px;
+    margin-top: 0.5rem;
+}
+
+#editTaskModal textarea {
+    height: 6rem;
+    resize: none;
+}
+
+#editTaskModal .submit-btn {
+    width: 100%;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+#editTaskModal .submit-btn:hover {
+    background-color: #219150;
+}

@@ -1163,3 +1163,152 @@ function displayProjectDetails(projectTitle) {
 
 
 ///////////////////////////////////// ✅ edit task ///////////////////////
+document.addEventListener("DOMContentLoaded", function () {
+    const tableBody = document.querySelector(".tasks-table tbody");
+    const editTaskBtn = document.querySelector(".edit-task-btn");
+    const editTaskModal = document.getElementById("editTaskModal");
+    const closeEditModal = editTaskModal.querySelector(".close");
+    const modalOverlay = document.querySelector(".modal-overlay");
+    let selectedTaskId = null;
+    let selectedRow = null;
+
+    // Function to Load Projects & Students into Edit Modal
+    function loadProjectsAndStudentsForEdit() {
+        let projectSelect = document.getElementById("editProject");
+        let studentSelect = document.getElementById("editAssignedStudent");
+
+        // Load projects from localStorage
+        let projects = JSON.parse(localStorage.getItem("projects")) || [];
+        projectSelect.innerHTML = '<option selected disabled value="">Select a project</option>';
+        projects.forEach(project => {
+            let option = document.createElement("option");
+            option.value = project.title;
+            option.textContent = project.title;
+            projectSelect.appendChild(option);
+        });
+
+        // Load students from localStorage
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        let students = users.filter(user => user.role === "Student");
+        studentSelect.innerHTML = '<option selected disabled value="">Select a student</option>';
+        students.forEach(student => {
+            let option = document.createElement("option");
+            option.value = student.username;
+            option.textContent = student.username;
+            studentSelect.appendChild(option);
+        });
+    }
+
+    // Select task row and enable "Edit Task" button
+    tableBody.addEventListener("click", function (event) {
+        const row = event.target.closest("tr");
+        if (!row) return;
+
+        document.querySelectorAll(".tasks-table tbody tr").forEach(r => r.classList.remove("selected"));
+        row.classList.add("selected");
+        editTaskBtn.removeAttribute("disabled");
+
+        selectedTaskId = parseInt(row.cells[0].textContent);
+        selectedRow = row;
+    });
+
+    // Open "Edit Task" Modal
+    editTaskBtn.addEventListener("click", function () {
+        if (!selectedTaskId || !selectedRow) return;
+
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        let selectedTask = tasks.find(task => task.id === selectedTaskId);
+        if (!selectedTask) return;
+
+        // Load projects & students before showing modal
+        loadProjectsAndStudentsForEdit();
+
+        // Open modal
+        editTaskModal.style.display = "flex";
+        modalOverlay.style.display = "block";
+
+        // Pre-fill modal fields
+        document.getElementById("editProject").value = selectedTask.project;
+        document.getElementById("editTaskName").value = selectedTask.taskName;
+        document.getElementById("editDescription").value = selectedTask.description;
+        document.getElementById("editAssignedStudent").value = selectedTask.assignedStudent;
+        document.getElementById("editStatus").value = selectedTask.status;
+        document.getElementById("editDueDate").value = selectedTask.dueDate;
+
+        document.getElementById("editTaskForm").setAttribute("data-editing-id", selectedTaskId);
+    });
+
+    // Close "Edit Task" Modal
+    closeEditModal.addEventListener("click", function () {
+        editTaskModal.style.display = "none";
+        modalOverlay.style.display = "none";
+    });
+
+    // Handle "Edit Task" Form Submission
+    document.getElementById("editTaskForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        const editingId = document.getElementById("editTaskForm").getAttribute("data-editing-id");
+
+        const updatedTask = {
+            id: parseInt(editingId),
+            project: document.getElementById("editProject").value,
+            taskName: document.getElementById("editTaskName").value,
+            description: document.getElementById("editDescription").value,
+            assignedStudent: document.getElementById("editAssignedStudent").value,
+            status: document.getElementById("editStatus").value,
+            dueDate: document.getElementById("editDueDate").value
+        };
+
+        // Update localStorage
+        let taskIndex = tasks.findIndex(task => task.id === parseInt(editingId));
+        if (taskIndex !== -1) {
+            tasks[taskIndex] = updatedTask;
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+
+        // Update the selected row in the table instantly
+        if (selectedRow) {
+            selectedRow.cells[1].textContent = updatedTask.project;
+            selectedRow.cells[2].textContent = updatedTask.taskName;
+            selectedRow.cells[3].textContent = updatedTask.description;
+            selectedRow.cells[4].textContent = updatedTask.assignedStudent;
+            selectedRow.cells[5].textContent = updatedTask.status;
+            selectedRow.cells[6].textContent = updatedTask.dueDate;
+
+            selectedRow.classList.remove("selected");
+            selectedRow = null;
+        }
+
+        // Disable the "Edit Task" button after editing
+        editTaskBtn.setAttribute("disabled", "true");
+
+        // Close Modal
+        editTaskModal.style.display = "none";
+        modalOverlay.style.display = "none";
+    });
+
+    // Ensure table updates when page loads
+    function loadTasksFromStorage() {
+        tableBody.innerHTML = ""; // Clear the table
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+        tasks.forEach(task => {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td>${task.id}</td>
+                <td>${task.project}</td>
+                <td>${task.taskName}</td>
+                <td>${task.description}</td>
+                <td>${task.assignedStudent}</td>
+                <td class="status ${task.status.toLowerCase()}">${task.status}</td>
+                <td>${task.dueDate}</td>
+            `;
+            tableBody.appendChild(newRow);
+        });
+    }
+
+    // Load tasks initially
+    loadTasksFromStorage();
+});

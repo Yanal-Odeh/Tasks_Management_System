@@ -139,6 +139,7 @@
         
         
         <!-- three -->
+         
         <div id="tasksContent" class="content-section">
             <div class="tasks-header">
                 <div class="popup">
@@ -158,7 +159,52 @@
                 </div>
                 
 
+                <!-- Edit Task Modal -->
+<div id="editTaskModal" class="modal">
+    <span class="close">&times;</span>
+    <h2>Edit Task</h2>
 
+    <form id="editTaskForm" autocomplete="off">
+        <!-- Project Selection (Dynamically Loaded) -->
+        <label for="editProject">Project Title:</label>
+        <select id="editProject" required></select>
+
+        <!-- Task Name -->
+        <label for="editTaskName">Task Name:</label>
+        <input type="text" id="editTaskName" required>
+
+        <!-- Task Description -->
+        <label for="editDescription">Description:</label>
+        <textarea id="editDescription" required></textarea>
+
+        <!-- Assigned Student (Dynamically Loaded) -->
+        <label for="editAssignedStudent">Assigned Student:</label>
+        <select id="editAssignedStudent" required></select>
+
+        <!-- Task Status -->
+        <label for="editStatus">Status:</label>
+        <select id="editStatus" required>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="pending">Pending</option>
+            <option value="on-hold">On Hold</option>
+            <option value="cancelled">Cancelled</option>
+        </select>
+
+        <!-- Due Date -->
+        <label for="editDueDate">Due Date:</label>
+        <input type="date" id="editDueDate" required>
+
+        <button type="submit" class="submit-btn">Update Task</button>
+    </form>
+</div>
+
+<!-- Modal Overlay -->
+<div class="modal-overlay"></div>
+
+
+                    
+                
 
                 
                     <!-- Task Creation Modal -->
