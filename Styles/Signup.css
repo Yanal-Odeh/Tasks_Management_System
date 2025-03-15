@@ -18,7 +18,7 @@ body {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(0.5rem);
     width: 90%;
-    max-width: 26rem; /* 416px */
+    max-width: 26rem; 
     text-align: center;
     color: white;
     animation: fadeIn 0.5s ease-in-out;

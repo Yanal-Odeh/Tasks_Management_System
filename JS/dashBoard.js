@@ -229,188 +229,141 @@ new Chart(ctx, {
 ///////////////////////////////////// ✅ Task Modal Handling + sorting //////////////////////////////////
 
 document.addEventListener("DOMContentLoaded", function () {
-const modal = document.getElementById("taskModal");
-const overlay = document.querySelector(".modal-overlay");
-const openModalBtn = document.querySelector(".new-task-btn");
-const closeModalBtn = modal.querySelector(".close");
-const taskForm = document.getElementById("taskForm");
-const tableBody = document.querySelector(".tasks-table tbody");
-const sortSelect = document.getElementById("sortTasks");
-const assignedStudentSelect = document.getElementById("assignedStudent");
-const projectSelect = document.getElementById("project");
+    const modal = document.getElementById("taskModal");
+    const overlay = document.querySelector(".modal-overlay");
+    const openModalBtn = document.querySelector(".new-task-btn");
+    const closeModalBtn = modal.querySelector(".close");
+    const taskForm = document.getElementById("taskForm");
+    const tableBody = document.querySelector(".tasks-table tbody");
+    const sortSelect = document.getElementById("sortTasks");
+    const assignedStudentSelect = document.getElementById("assignedStudent");
+    const projectSelect = document.getElementById("project");
 
+    // ✅ Define priority levels for statuses
+    const statusPriority = {
+        "completed": 1,    
+        "in-progress": 2,  
+        "pending": 3,      
+        "on-hold": 4,      
+        "cancelled": 5     
+    };
 
-// Retrieve users from localStorage
-const users = JSON.parse(localStorage.getItem("users")) || [];
-// Retrieve projects from localStorage
-const projects = JSON.parse(localStorage.getItem("projects")) || [];
+    // ✅ Load tasks from Local Storage on page load
+    loadTasksFromStorage();
 
-// Filter only students
-const students = users.filter(user => user.role === "Student");
+    // ✅ Ensure the modal is hidden on page load
+    modal.style.display = "none";
+    overlay.style.display = "none";
 
-// Populate the students dropdown list dynamically
-if (students.length > 0) {
-    assignedStudentSelect.innerHTML = '<option selected disabled value="">Select a student</option>'; // Clear existing options
-    students.forEach(student => {
-        const option = document.createElement("option");
-        option.textContent = student.username;
-        option.value = student.username;
-        assignedStudentSelect.appendChild(option);
-    });
-} else {
-    assignedStudentSelect.innerHTML = '<option>No students registered</option>';
-}
-
-// Populate the projects dropdown list dynamically
-if (projects.length > 0) {
-    projectSelect.innerHTML = '<option selected disabled value="">Select a project</option>'; // Clear existing options
-    projects.forEach(project => {
-        const option = document.createElement("option");
-        option.textContent = project.title;
-        option.value = project.title;
-        projectSelect.appendChild(option);
-    });
-} else {
-    projectSelect.innerHTML = '<option>No projects registered</option>';
-}
-// Load tasks from Local Storage on page load
-loadTasksFromStorage();
-
-// Ensure the modal is hidden on page load
-modal.style.display = "none";
-overlay.style.display = "none";
-
-// Function to toggle modal visibility
-function toggleModal(show) {
-    modal.style.display = show ? "flex" : "none";
-    overlay.style.display = show ? "block" : "none";
-}
-
-// Open Modal
-openModalBtn.addEventListener("click", () => toggleModal(true));
-
-// Close Modal (X Button & Overlay Click)
-closeModalBtn.addEventListener("click", () => toggleModal(false));
-overlay.addEventListener("click", () => toggleModal(false));
-
-// Close Modal with Escape key
-document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") toggleModal(false);
-});
-
-// ✅ Add New Task to Table & Local Storage (Appending Instead of Overwriting)
-taskForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    // Get input values
-    const project = document.getElementById("project").value;
-    const taskName = document.getElementById("taskName").value;
-    const description = document.getElementById("description").value;
-    const assignedStudent = document.getElementById("assignedStudent").value;
-    const status = document.getElementById("status").value;
-    const dueDate = document.getElementById("dueDate").value;
-
-    // Get last ID from local storage and continue from it
-    let tasks = getTasksFromStorage();
-    let lastTaskId = tasks.length ? Math.max(...tasks.map(task => task.id)) : 0;
-    const newTaskId = lastTaskId + 1;
-
-    // Create a new Task Object
-    const newTask = { id: newTaskId, project, taskName, description, assignedStudent, status, dueDate };
-
-    // Save to Local Storage
-    tasks.push(newTask);
-    saveTasksToStorage(tasks);
-
-    // Append task to the table instead of rewriting
-    addTaskToTable(newTask);
-
-    // Reset the form & close modal
-    taskForm.reset();
-    toggleModal(false);
-});
-
-// ✅ Sorting Functionality (Sort & Reassign Task IDs)
-sortSelect.addEventListener("change", function () {
-    const sortBy = this.value;
-    let tasks = getTasksFromStorage();
-
-    switch (sortBy) {
-        case "status":
-            tasks = sortByStatus(tasks);
-            break;
-        case "project":
-            tasks = sortByProject(tasks);
-            break;
-        case "due-date":
-            tasks = sortByDueDate(tasks);
-            break;
-        case "assigned-student":
-            tasks = sortByAssignedStudent(tasks);
-            break;
+    // ✅ Function to toggle modal visibility
+    function toggleModal(show) {
+        modal.style.display = show ? "flex" : "none";
+        overlay.style.display = show ? "block" : "none";
     }
 
-    // Reassign task IDs after sorting to maintain sequential order
-    tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
+    // ✅ Open Modal for New Task
+    openModalBtn.addEventListener("click", () => {
+        taskForm.reset();
+        toggleModal(true);
+    });
 
-    // Save sorted tasks & reload table
-    saveTasksToStorage(tasks);
-    refreshTaskTable(tasks);
-});
+    // ✅ Close Modal (X Button & Overlay Click)
+    closeModalBtn.addEventListener("click", () => toggleModal(false));
+    overlay.addEventListener("click", () => toggleModal(false));
 
-// ✅ Sorting Functions (Maintains Task Order & Reassigns IDs)
-function sortByStatus(tasks) {
-    return tasks.sort((a, b) => a.status.localeCompare(b.status));
-}
+    // ✅ Close Modal with Escape key
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") toggleModal(false);
+    });
 
-function sortByProject(tasks) {
-    return tasks.sort((a, b) => a.project.localeCompare(b.project));
-}
+    // ✅ Add New Task to Table & Local Storage
+    taskForm.addEventListener("submit", function (event) {
+        event.preventDefault();
 
-function sortByDueDate(tasks) {
-    return tasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-}
+        // Get input values
+        const project = document.getElementById("project").value;
+        const taskName = document.getElementById("taskName").value;
+        const description = document.getElementById("description").value;
+        const assignedStudent = document.getElementById("assignedStudent").value;
+        const status = document.getElementById("status").value;
+        const dueDate = document.getElementById("dueDate").value;
 
-function sortByAssignedStudent(tasks) {
-    return tasks.sort((a, b) => a.assignedStudent.localeCompare(b.assignedStudent));
-}
+        if (!project || !taskName || !description || !assignedStudent || !status || !dueDate) {
+            alert("⚠️ Please fill in all fields.");
+            return;
+        }
 
-// ✅ Load Tasks from Local Storage and Append to Table (No Overwriting)
-function loadTasksFromStorage() {
-    const tasks = getTasksFromStorage();
-    tasks.forEach(addTaskToTable); // Append instead of overwriting
-}
+        let tasks = getTasksFromStorage();
+        let newTaskId = tasks.length ? Math.max(...tasks.map(task => task.id)) + 1 : 1;
 
-// ✅ Append Task to Table Without Clearing
-function addTaskToTable(task) {
-    const newRow = document.createElement("tr");
-    newRow.innerHTML = `
-        <td>${task.id}</td>
-        <td>${task.project}</td>
-        <td>${task.taskName}</td>
-        <td>${task.description}</td>
-        <td>${task.assignedStudent}</td>
-        <td class="status ${task.status.toLowerCase()}">${task.status}</td>
-        <td>${task.dueDate}</td>
-    `;
-    tableBody.appendChild(newRow); // Append instead of replacing
-}
+        const newTask = { id: newTaskId, project, taskName, description, assignedStudent, status, dueDate };
 
-// ✅ Refresh Task Table Without Clearing Everything
-function refreshTaskTable(tasks) {
-    tableBody.innerHTML = ""; // Clear the table body only (not local storage)
-    tasks.forEach(addTaskToTable);
-}
+        // Save to Local Storage
+        tasks.push(newTask);
+        saveTasksToStorage(tasks);
 
-// ✅ Get Tasks from Local Storage
-function getTasksFromStorage() {
-    return JSON.parse(localStorage.getItem("tasks")) || [];
-}
+        // Append task to the table instead of rewriting
+        addTaskToTable(newTask);
 
-// ✅ Save Tasks to Local Storage
-function saveTasksToStorage(tasks) {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-}
+        // Reset the form & close modal
+        taskForm.reset();
+        toggleModal(false);
+    });
+
+    // ✅ Sorting Functionality (Preserves Task IDs)
+    sortSelect.addEventListener("change", function () {
+        let tasks = getTasksFromStorage(); // Retrieve tasks without modifying IDs
+
+        const sortBy = this.value;
+        if (sortBy === "status") {
+            tasks.sort((a, b) => statusPriority[a.status.toLowerCase()] - statusPriority[b.status.toLowerCase()]);
+        } else if (sortBy === "project") {
+            tasks.sort((a, b) => a.project.localeCompare(b.project));
+        } else if (sortBy === "due-date") {
+            tasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+        } else if (sortBy === "assigned-student") {
+            tasks.sort((a, b) => a.assignedStudent.localeCompare(b.assignedStudent));
+        }
+
+        refreshTaskTable(tasks);
+    });
+
+    // ✅ Update Task Table Without Modifying Stored Data
+    function refreshTaskTable(tasks) {
+        tableBody.innerHTML = ""; // Clear only the displayed table, not storage
+        tasks.forEach(addTaskToTable); // Re-display tasks in the sorted order
+    }
+
+    // ✅ Load Tasks from Local Storage and Append to Table (No Overwriting)
+    function loadTasksFromStorage() {
+        const tasks = getTasksFromStorage();
+        tasks.forEach(addTaskToTable);
+    }
+
+    // ✅ Append Task to Table Without Clearing Stored Data
+    function addTaskToTable(task) {
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <td>${task.id}</td>
+            <td>${task.project}</td>
+            <td>${task.taskName}</td>
+            <td>${task.description}</td>
+            <td>${task.assignedStudent}</td>
+            <td class="status ${task.status.toLowerCase()}">${task.status}</td>
+            <td>${task.dueDate}</td>
+        `;
+        tableBody.appendChild(newRow);
+    }
+
+    // ✅ Get Tasks from Local Storage
+    function getTasksFromStorage() {
+        return JSON.parse(localStorage.getItem("tasks")) || [];
+    }
+
+    // ✅ Save Tasks to Local Storage
+    function saveTasksToStorage(tasks) {
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
 });
 
 
