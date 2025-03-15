@@ -227,7 +227,6 @@ new Chart(ctx, {
 
 
 ///////////////////////////////////// ✅ Task Modal Handling + sorting //////////////////////////////////
-
 document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("taskModal");
     const overlay = document.querySelector(".modal-overlay");
@@ -239,7 +238,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const assignedStudentSelect = document.getElementById("assignedStudent");
     const projectSelect = document.getElementById("project");
 
-    // ✅ Define priority levels for statuses
+    let editTaskId = null;
+
     const statusPriority = {
         "completed": 1,    
         "in-progress": 2,  
@@ -248,43 +248,53 @@ document.addEventListener("DOMContentLoaded", function () {
         "cancelled": 5     
     };
 
-    // ✅ Load tasks from Local Storage on page load
-    loadTasksFromStorage();
-
-    // ✅ Ensure the modal is hidden on page load
     modal.style.display = "none";
     overlay.style.display = "none";
 
-    // ✅ Function to toggle modal visibility
     function toggleModal(show) {
         modal.style.display = show ? "flex" : "none";
         overlay.style.display = show ? "block" : "none";
     }
 
-    // ✅ Open Modal for New Task
+    // Open modal for new task
     openModalBtn.addEventListener("click", () => {
         taskForm.reset();
+        editTaskId = null;
+        loadStudents();
+        loadProjects();
+
+        if (!validateProjectAndStudent()) {
+            return;
+        }
+
         toggleModal(true);
     });
 
-    // ✅ Close Modal (X Button & Overlay Click)
+    // Close modal
     closeModalBtn.addEventListener("click", () => toggleModal(false));
     overlay.addEventListener("click", () => toggleModal(false));
 
-    // ✅ Close Modal with Escape key
+    // Close modal with Escape key
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") toggleModal(false);
     });
 
-    // ✅ Add New Task to Table & Local Storage
+    loadTasksFromStorage();
+    loadStudents(); // Load students when the page loads
+    loadProjects(); // Load projects when the page loads
+
+    // Handle form submission
     taskForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        // Get input values
-        const project = document.getElementById("project").value;
+        if (!validateProjectAndStudent()) {
+            return;
+        }
+
+        const project = projectSelect.value;
         const taskName = document.getElementById("taskName").value;
         const description = document.getElementById("description").value;
-        const assignedStudent = document.getElementById("assignedStudent").value;
+        const assignedStudent = assignedStudentSelect.value;
         const status = document.getElementById("status").value;
         const dueDate = document.getElementById("dueDate").value;
 
@@ -294,26 +304,33 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         let tasks = getTasksFromStorage();
-        let newTaskId = tasks.length ? Math.max(...tasks.map(task => task.id)) + 1 : 1;
 
-        const newTask = { id: newTaskId, project, taskName, description, assignedStudent, status, dueDate };
+        try {
+            if (editTaskId) {
+                // Edit existing task
+                let taskIndex = tasks.findIndex(task => task.id === editTaskId);
+                if (taskIndex !== -1) {
+                    tasks[taskIndex] = { id: editTaskId, project, taskName, description, assignedStudent, status, dueDate };
+                }
+            } else {
+                // Add new task
+                let newTaskId = tasks.length ? Math.max(...tasks.map(task => task.id)) + 1 : 1;
+                tasks.push({ id: newTaskId, project, taskName, description, assignedStudent, status, dueDate });
+            }
 
-        // Save to Local Storage
-        tasks.push(newTask);
-        saveTasksToStorage(tasks);
-
-        // Append task to the table instead of rewriting
-        addTaskToTable(newTask);
-
-        // Reset the form & close modal
-        taskForm.reset();
-        toggleModal(false);
+            saveTasksToStorage(tasks);
+            refreshTaskTable(tasks);
+            taskForm.reset();
+            toggleModal(false);
+        } catch (error) {
+            alert("⚠️ An error occurred while saving the task. Please try again.");
+            console.error("Error saving task:", error);
+        }
     });
 
-    // ✅ Sorting Functionality (Preserves Task IDs)
+    // Sorting tasks by selected criteria
     sortSelect.addEventListener("change", function () {
-        let tasks = getTasksFromStorage(); // Retrieve tasks without modifying IDs
-
+        let tasks = getTasksFromStorage();
         const sortBy = this.value;
         if (sortBy === "status") {
             tasks.sort((a, b) => statusPriority[a.status.toLowerCase()] - statusPriority[b.status.toLowerCase()]);
@@ -324,23 +341,16 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if (sortBy === "assigned-student") {
             tasks.sort((a, b) => a.assignedStudent.localeCompare(b.assignedStudent));
         }
-
         refreshTaskTable(tasks);
     });
 
-    // ✅ Update Task Table Without Modifying Stored Data
+    // Refresh task table with the latest data
     function refreshTaskTable(tasks) {
-        tableBody.innerHTML = ""; // Clear only the displayed table, not storage
-        tasks.forEach(addTaskToTable); // Re-display tasks in the sorted order
-    }
-
-    // ✅ Load Tasks from Local Storage and Append to Table (No Overwriting)
-    function loadTasksFromStorage() {
-        const tasks = getTasksFromStorage();
+        tableBody.innerHTML = "";
         tasks.forEach(addTaskToTable);
     }
 
-    // ✅ Append Task to Table Without Clearing Stored Data
+    // Add task row to the table
     function addTaskToTable(task) {
         const newRow = document.createElement("tr");
         newRow.innerHTML = `
@@ -352,20 +362,131 @@ document.addEventListener("DOMContentLoaded", function () {
             <td class="status ${task.status.toLowerCase()}">${task.status}</td>
             <td>${task.dueDate}</td>
         `;
+
+        // Edit task row on click
+        newRow.addEventListener("click", () => editTask(task));
         tableBody.appendChild(newRow);
     }
 
-    // ✅ Get Tasks from Local Storage
+    // Edit task functionality
+    function editTask(task) {
+        if (confirm(`Are you sure you want to edit the task: ${task.taskName}?`)) {
+            editTaskId = task.id;
+            document.getElementById("project").value = task.project;
+            document.getElementById("taskName").value = task.taskName;
+            document.getElementById("description").value = task.description;
+            document.getElementById("assignedStudent").value = task.assignedStudent;
+            document.getElementById("status").value = task.status;
+            document.getElementById("dueDate").value = task.dueDate;
+
+            toggleModal(true);
+        }
+    }
+
+    // Retrieve tasks from local storage
     function getTasksFromStorage() {
         return JSON.parse(localStorage.getItem("tasks")) || [];
     }
 
-    // ✅ Save Tasks to Local Storage
+    // Save tasks to local storage
     function saveTasksToStorage(tasks) {
-        localStorage.setItem("tasks", JSON.stringify(tasks));
+        try {
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        } catch (error) {
+            alert("⚠️ An error occurred while saving tasks to storage.");
+            console.error("Error saving tasks:", error);
+        }
+    }
+
+    // Load students into the dropdown
+    function loadStudents() {
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        assignedStudentSelect.innerHTML = '<option value="">Select a student</option>';
+        users.filter(user => user.role === "Student").forEach(student => {
+            const option = document.createElement("option");
+            option.value = student.username;
+            option.textContent = student.username;
+            assignedStudentSelect.appendChild(option);
+        });
+    }
+
+    // Load projects into the dropdown
+    function loadProjects() {
+        const projects = JSON.parse(localStorage.getItem("projects")) || [];
+        projectSelect.innerHTML = '<option value="">Select a project</option>';
+        projects.forEach(project => {
+            const option = document.createElement("option");
+            option.value = project.title;
+            option.textContent = project.title;
+            projectSelect.appendChild(option);
+        });
+    }
+
+    // Validate if at least one student and one project exist
+    function validateProjectAndStudent() {
+        let students = JSON.parse(localStorage.getItem("users")) || [];
+        let projects = JSON.parse(localStorage.getItem("projects")) || [];
+
+        let hasStudents = students.some(user => user.role === "Student");
+        let hasProjects = projects.length > 0;
+
+        if (!hasStudents) {
+            alert("⚠️ No students available. Please add students first.");
+            return false;
+        }
+        if (!hasProjects) {
+            alert("⚠️ No projects available. Please add projects first.");
+            return false;
+        }
+        return true;
     }
 });
 
+document.getElementById("projectForm")?.addEventListener("submit", function (event) {
+    event.preventDefault();
+    const projectTitle = document.getElementById("projectTitle").value.trim();
+    if (!projectTitle) {
+        alert("Project title is required.");
+        return;
+    }
+
+    let projects = JSON.parse(localStorage.getItem("projects")) || [];
+    if (projects.some(proj => proj.title.toLowerCase() === projectTitle.toLowerCase())) {
+        alert("Project title already exists.");
+        return;
+    }
+
+    projects.push({ title: projectTitle });
+    localStorage.setItem("projects", JSON.stringify(projects));
+    alert("Project added successfully!");
+    loadProjects();
+});
+
+document.getElementById("signup-form")?.addEventListener("submit", function (event) {
+    event.preventDefault();
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const isStudent = document.getElementById("student").checked;
+    const universityId = document.getElementById("university-id").value.trim();
+
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
+        alert("Username already exists!");
+        return;
+    }
+
+    if (isStudent && users.some(user => user.universityId === universityId)) {
+        alert("University ID already exists!");
+        return;
+    }
+
+    users.push({ username, password, role: isStudent ? "Student" : "Admin", universityId: isStudent ? universityId : null });
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("Sign-up successful!");
+    loadStudents();
+    window.location.href = "Signin.html";
+});
 
 /////////////////////////////////////✅ Task Modal Handling + sorting//////////////////////////////////
 
