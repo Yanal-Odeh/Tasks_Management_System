@@ -238,8 +238,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const assignedStudentSelect = document.getElementById("assignedStudent");
     const projectSelect = document.getElementById("project");
 
-    let editTaskId = null;
-
     const statusPriority = {
         "completed": 1,    
         "in-progress": 2,  
@@ -256,84 +254,67 @@ document.addEventListener("DOMContentLoaded", function () {
         overlay.style.display = show ? "block" : "none";
     }
 
-    // Open modal for new task
     openModalBtn.addEventListener("click", () => {
         taskForm.reset();
-        editTaskId = null;
         loadStudents();
         loadProjects();
-
-        if (!validateProjectAndStudent()) {
-            return;
-        }
-
+        if (!validateProjectAndStudent()) return;
         toggleModal(true);
     });
 
-    // Close modal
     closeModalBtn.addEventListener("click", () => toggleModal(false));
     overlay.addEventListener("click", () => toggleModal(false));
-
-    // Close modal with Escape key
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") toggleModal(false);
     });
 
-    loadTasksFromStorage();
-    loadStudents(); // Load students when the page loads
-    loadProjects(); // Load projects when the page loads
+    function loadTasks() {
+        tableBody.innerHTML = ""; 
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-    // Handle form submission
+        // Re-assign task IDs dynamically based on their order
+        tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
+
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        tasks.forEach(addTaskToTable);
+    }
+    loadTasks();
+    loadStudents();
+    loadProjects();
+
     taskForm.addEventListener("submit", function (event) {
         event.preventDefault();
+        if (!validateProjectAndStudent()) return;
 
-        if (!validateProjectAndStudent()) {
-            return;
-        }
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-        const project = projectSelect.value;
-        const taskName = document.getElementById("taskName").value;
-        const description = document.getElementById("description").value;
-        const assignedStudent = assignedStudentSelect.value;
-        const status = document.getElementById("status").value;
-        const dueDate = document.getElementById("dueDate").value;
+        const task = {
+            id: tasks.length + 1,  // Assigning ID dynamically in order
+            project: projectSelect.value,
+            taskName: document.getElementById("taskName").value,
+            description: document.getElementById("description").value,
+            assignedStudent: assignedStudentSelect.value,
+            status: document.getElementById("status").value,
+            dueDate: document.getElementById("dueDate").value
+        };
 
-        if (!project || !taskName || !description || !assignedStudent || !status || !dueDate) {
+        if (Object.values(task).some(value => !value)) {
             alert("⚠️ Please fill in all fields.");
             return;
         }
 
-        let tasks = getTasksFromStorage();
-
-        try {
-            if (editTaskId) {
-                // Edit existing task
-                let taskIndex = tasks.findIndex(task => task.id === editTaskId);
-                if (taskIndex !== -1) {
-                    tasks[taskIndex] = { id: editTaskId, project, taskName, description, assignedStudent, status, dueDate };
-                }
-            } else {
-                // Add new task
-                let newTaskId = tasks.length ? Math.max(...tasks.map(task => task.id)) + 1 : 1;
-                tasks.push({ id: newTaskId, project, taskName, description, assignedStudent, status, dueDate });
-            }
-
-            saveTasksToStorage(tasks);
-            refreshTaskTable(tasks);
-            taskForm.reset();
-            toggleModal(false);
-        } catch (error) {
-            alert("⚠️ An error occurred while saving the task. Please try again.");
-            console.error("Error saving task:", error);
-        }
+        tasks.push(task);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        addTaskToTable(task);
+        taskForm.reset();
+        toggleModal(false);
     });
 
-    // Sorting tasks by selected criteria
     sortSelect.addEventListener("change", function () {
-        let tasks = getTasksFromStorage();
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
         const sortBy = this.value;
         if (sortBy === "status") {
-            tasks.sort((a, b) => statusPriority[a.status.toLowerCase()] - statusPriority[b.status.toLowerCase()]);
+            tasks.sort((a, b) => statusPriority[a.status] - statusPriority[b.status]);
         } else if (sortBy === "project") {
             tasks.sort((a, b) => a.project.localeCompare(b.project));
         } else if (sortBy === "due-date") {
@@ -341,100 +322,54 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if (sortBy === "assigned-student") {
             tasks.sort((a, b) => a.assignedStudent.localeCompare(b.assignedStudent));
         }
-        refreshTaskTable(tasks);
+        refreshTable(tasks);
     });
 
-    // Refresh task table with the latest data
-    function refreshTaskTable(tasks) {
+    function refreshTable(tasks) {
         tableBody.innerHTML = "";
         tasks.forEach(addTaskToTable);
     }
 
-    // Add task row to the table
     function addTaskToTable(task) {
-        const newRow = document.createElement("tr");
-        newRow.innerHTML = `
+        const row = document.createElement("tr");
+        row.innerHTML = `
             <td>${task.id}</td>
             <td>${task.project}</td>
             <td>${task.taskName}</td>
             <td>${task.description}</td>
             <td>${task.assignedStudent}</td>
-            <td class="status ${task.status.toLowerCase()}">${task.status}</td>
+            <td class="status ${task.status}">${task.status}</td>
             <td>${task.dueDate}</td>
         `;
-
-        // Edit task row on click
-        newRow.addEventListener("click", () => editTask(task));
-        tableBody.appendChild(newRow);
+        tableBody.appendChild(row);
     }
 
-    // Edit task functionality
-    function editTask(task) {
-        if (confirm(`Are you sure you want to edit the task: ${task.taskName}?`)) {
-            editTaskId = task.id;
-            document.getElementById("project").value = task.project;
-            document.getElementById("taskName").value = task.taskName;
-            document.getElementById("description").value = task.description;
-            document.getElementById("assignedStudent").value = task.assignedStudent;
-            document.getElementById("status").value = task.status;
-            document.getElementById("dueDate").value = task.dueDate;
-
-            toggleModal(true);
-        }
-    }
-
-    // Retrieve tasks from local storage
-    function getTasksFromStorage() {
-        return JSON.parse(localStorage.getItem("tasks")) || [];
-    }
-
-    // Save tasks to local storage
-    function saveTasksToStorage(tasks) {
-        try {
-            localStorage.setItem("tasks", JSON.stringify(tasks));
-        } catch (error) {
-            alert("⚠️ An error occurred while saving tasks to storage.");
-            console.error("Error saving tasks:", error);
-        }
-    }
-
-    // Load students into the dropdown
     function loadStudents() {
-        const users = JSON.parse(localStorage.getItem("users")) || [];
         assignedStudentSelect.innerHTML = '<option value="">Select a student</option>';
-        users.filter(user => user.role === "Student").forEach(student => {
-            const option = document.createElement("option");
-            option.value = student.username;
-            option.textContent = student.username;
-            assignedStudentSelect.appendChild(option);
-        });
+        (JSON.parse(localStorage.getItem("users")) || [])
+            .filter(user => user.role === "Student")
+            .forEach(student => {
+                assignedStudentSelect.innerHTML += `<option value="${student.username}">${student.username}</option>`;
+            });
     }
 
-    // Load projects into the dropdown
     function loadProjects() {
-        const projects = JSON.parse(localStorage.getItem("projects")) || [];
         projectSelect.innerHTML = '<option value="">Select a project</option>';
-        projects.forEach(project => {
-            const option = document.createElement("option");
-            option.value = project.title;
-            option.textContent = project.title;
-            projectSelect.appendChild(option);
-        });
+        (JSON.parse(localStorage.getItem("projects")) || [])
+            .forEach(project => {
+                projectSelect.innerHTML += `<option value="${project.title}">${project.title}</option>`;
+            });
     }
 
-    // Validate if at least one student and one project exist
     function validateProjectAndStudent() {
-        let students = JSON.parse(localStorage.getItem("users")) || [];
-        let projects = JSON.parse(localStorage.getItem("projects")) || [];
+        const students = JSON.parse(localStorage.getItem("users")) || [];
+        const projects = JSON.parse(localStorage.getItem("projects")) || [];
 
-        let hasStudents = students.some(user => user.role === "Student");
-        let hasProjects = projects.length > 0;
-
-        if (!hasStudents) {
+        if (!students.some(user => user.role === "Student")) {
             alert("⚠️ No students available. Please add students first.");
             return false;
         }
-        if (!hasProjects) {
+        if (projects.length === 0) {
             alert("⚠️ No projects available. Please add projects first.");
             return false;
         }
@@ -442,51 +377,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-document.getElementById("projectForm")?.addEventListener("submit", function (event) {
-    event.preventDefault();
-    const projectTitle = document.getElementById("projectTitle").value.trim();
-    if (!projectTitle) {
-        alert("Project title is required.");
-        return;
-    }
-
-    let projects = JSON.parse(localStorage.getItem("projects")) || [];
-    if (projects.some(proj => proj.title.toLowerCase() === projectTitle.toLowerCase())) {
-        alert("Project title already exists.");
-        return;
-    }
-
-    projects.push({ title: projectTitle });
-    localStorage.setItem("projects", JSON.stringify(projects));
-    alert("Project added successfully!");
-    loadProjects();
-});
-
-document.getElementById("signup-form")?.addEventListener("submit", function (event) {
-    event.preventDefault();
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value;
-    const isStudent = document.getElementById("student").checked;
-    const universityId = document.getElementById("university-id").value.trim();
-
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-
-    if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
-        alert("Username already exists!");
-        return;
-    }
-
-    if (isStudent && users.some(user => user.universityId === universityId)) {
-        alert("University ID already exists!");
-        return;
-    }
-
-    users.push({ username, password, role: isStudent ? "Student" : "Admin", universityId: isStudent ? universityId : null });
-    localStorage.setItem("users", JSON.stringify(users));
-    alert("Sign-up successful!");
-    loadStudents();
-    window.location.href = "Signin.html";
-});
 
 /////////////////////////////////////✅ Task Modal Handling + sorting//////////////////////////////////
 
@@ -1010,23 +900,18 @@ deleteTaskBtn.addEventListener("click", function () {
 
 // ✅ Function to Load Tasks from Local Storage and Reassign IDs
 function loadTasksFromStorage() {
-    tableBody.innerHTML = ""; // Clear table before reloading
+    const tableBody = document.querySelector(".tasks-table tbody");
+    tableBody.innerHTML = ""; 
 
-    let tasks = getTasksFromStorage();
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-    // Reassign task IDs starting from 1 (in case of missing IDs)
+    // Assign task IDs starting from 1
     tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
 
-    // Save updated task list
-    saveTasksToStorage(tasks);
-
-    // Disable delete if no tasks exist
-    if (tasks.length === 0) {
-        deleteTaskBtn.setAttribute("disabled", "true");
-    }
-
+    localStorage.setItem("tasks", JSON.stringify(tasks));
     tasks.forEach(addTaskToTable);
 }
+
 
 // ✅ Function to Add a Task to the Table
 function addTaskToTable(task) {
