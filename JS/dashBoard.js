@@ -955,10 +955,6 @@ closeModalBtn.addEventListener("click", closeModal);
 modalOverlay.addEventListener("click", closeModal);
 });
 
-
-
-
-
 ///////////////////////////////////// ✅ sign is as a student ///////////////////////
 document.addEventListener("DOMContentLoaded", function () {
 // Get logged-in user details
@@ -1058,10 +1054,6 @@ filterTasks();
 
 
 ///////////////////////////////////// ✅ sign is as a student ///////////////////////
-
-
-
-
 
 
 document.addEventListener("DOMContentLoaded", function () {
