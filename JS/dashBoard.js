@@ -418,6 +418,71 @@ function saveTasksToStorage(tasks) {
 
 
 
+/////////////////////////////////////dragging task model//////////////////////////////////
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("taskModal");
+    const overlay = document.querySelector(".modal-overlay");
+    const openModalBtn = document.querySelector(".new-task-btn");
+    const closeModalBtn = modal.querySelector(".close");
+    const modalHeader = modal.querySelector("h2"); // Drag only from header
+
+    let isDragging = false;
+    let offsetX = 0, offsetY = 0;
+
+    // ✅ Start dragging when clicking on the "Create New Task" (h2)
+    modalHeader.addEventListener("mousedown", function (event) {
+        isDragging = true;
+        offsetX = event.clientX - modal.offsetLeft;
+        offsetY = event.clientY - modal.offsetTop;
+        modal.style.cursor = "grabbing";
+    });
+
+    // ✅ Move modal while dragging (No viewport restriction)
+    document.addEventListener("mousemove", function (event) {
+        if (!isDragging) return;
+
+        let newX = event.clientX - offsetX;
+        let newY = event.clientY - offsetY;
+
+        // Allows modal to be dragged anywhere (even outside viewport)
+        modal.style.left = `${newX}px`;
+        modal.style.top = `${newY}px`;
+    });
+
+    // ✅ Stop dragging when releasing mouse
+    document.addEventListener("mouseup", function () {
+        isDragging = false;
+        modal.style.cursor = "default";
+    });
+
+    // ✅ Function to toggle modal visibility (Keeps Position)
+    function toggleModal(show) {
+        if (show) {
+            modal.style.display = "flex";
+            overlay.style.display = "block";
+        } else {
+            modal.style.display = "none";
+            overlay.style.display = "none";
+        }
+    }
+
+    // ✅ Open Modal
+    openModalBtn.addEventListener("click", () => {
+        toggleModal(true);
+    });
+
+    // ✅ Close Modal
+    closeModalBtn.addEventListener("click", () => toggleModal(false));
+    overlay.addEventListener("click", () => toggleModal(false));
+
+    // ✅ Close with Escape key
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") toggleModal(false);
+    });
+});
+
+
+/////////////////////////////////////dragging task model//////////////////////////////////
 
 
 
@@ -1134,3 +1199,8 @@ function displayProjectDetails(projectTitle) {
 });
 
 
+///////////////////////////////////// ✅ sign is as a student ///////////////////////
+
+
+
+///////////////////////////////////// ✅ edit task ///////////////////////

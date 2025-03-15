@@ -147,6 +147,7 @@ form #status:focus,form #assignedStudent:focus,form #project:focus{
 .modal {
     transition: opacity 0.3s ease-in-out;
     width: 50%;
+    cursor: default; 
     max-width: 600px;
     min-width: 300px;
     position:absolute;
@@ -178,10 +179,13 @@ form #status:focus,form #assignedStudent:focus,form #project:focus{
 
 
 .modal h2 {
+    cursor: grab; /* Show grab cursor when hovering over the title */
     color:rgb(35, 98, 200);
     font-size: 1.8rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1rem;    padding: 0.5rem; /* Make dragging easier */
 }
+
+
 
 .modal label {
     font-size: 1.2rem;
