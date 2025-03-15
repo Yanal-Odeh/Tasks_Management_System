@@ -29,14 +29,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // If the user is a student, ensure the university ID is unique
         if (isStudent) {
-            const existingUniId = users.find(user => user.universityId === universityId);
-            if (existingUniId) {
-                alert("University ID already exists! Please enter a unique university ID.");
+            if (!universityId) {
+                alert("University ID is required for students.");
                 return;
             }
 
-            if (!universityId) {
-                alert("University ID is required for students.");
+            const existingUniId = users.find(user => user.universityId === universityId);
+            if (existingUniId) {
+                alert("University ID already exists! Please enter a unique university ID.");
                 return;
             }
         }
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Create new user object
         const newUser = {
             username: username,
-            password: password, // ⚠️ Storing plain text passwords is not secure in real applications
+            password: password, // ⚠️ In real applications, never store passwords in plain text
             role: isStudent ? "Student" : "Admin",
             universityId: isStudent ? universityId : null
         };
@@ -55,8 +55,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // Save updated users list to local storage
         localStorage.setItem("users", JSON.stringify(users));
 
-        alert("Sign-up successful! User data saved.");
-        signupForm.reset();
-        universityIdGroup.style.display = "none"; // Hide university ID field after submission
+        alert("Sign-up successful! Redirecting to Sign In page...");
+
+        // Redirect to the Sign In page
+        window.location.href = "Signin.html";
     });
 });

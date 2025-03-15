@@ -24,6 +24,11 @@
     border-radius: 0.5rem; 
 }
 
+.stud-part h2 {
+    color: white;
+    margin-left: 1rem;
+}
+
 .students p{
     margin-top: 0.8rem;
     margin-left: 0.6rem;
