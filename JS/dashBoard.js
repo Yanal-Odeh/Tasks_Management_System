@@ -133,6 +133,161 @@ if (isAdmin) {
 });
 
 
+///////////////////////////////////// ✅ edit task ///////////////////////
+document.addEventListener("DOMContentLoaded", function () {
+    const tableBody = document.querySelector(".tasks-table tbody");
+    const editTaskBtn = document.querySelector(".edit-task-btn");
+    const editTaskModal = document.getElementById("editTaskModal");
+    const closeEditModal = editTaskModal.querySelector(".close");
+    const modalOverlay = document.querySelector(".modal-overlay");
+    let selectedTaskId = null;
+    let selectedRow = null;
+    editTaskModal.style.display = "none";
+    modalOverlay.style.display = "none";
+
+    // Function to Load Projects & Students into Edit Modal
+    function loadProjectsAndStudentsForEdit() {
+        let projectSelect = document.getElementById("editProject");
+        let studentSelect = document.getElementById("editAssignedStudent");
+
+        // Load projects from localStorage
+        let projects = JSON.parse(localStorage.getItem("projects")) || [];
+        projectSelect.innerHTML = '<option selected disabled value="">Select a project</option>';
+        projects.forEach(project => {
+            let option = document.createElement("option");
+            option.value = project.title;
+            option.textContent = project.title;
+            projectSelect.appendChild(option);
+        });
+
+        // Load students from localStorage
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        let students = users.filter(user => user.role === "Student");
+        studentSelect.innerHTML = '<option selected disabled value="">Select a student</option>';
+        students.forEach(student => {
+            let option = document.createElement("option");
+            option.value = student.username;
+            option.textContent = student.username;
+            studentSelect.appendChild(option);
+        });
+    }
+
+    // Select task row and enable "Edit Task" button
+    tableBody.addEventListener("click", function (event) {
+        const row = event.target.closest("tr");
+        if (!row) return;
+
+        document.querySelectorAll(".tasks-table tbody tr").forEach(r => r.classList.remove("selected"));
+        row.classList.add("selected");
+        editTaskBtn.removeAttribute("disabled");
+
+        selectedTaskId = parseInt(row.cells[0].textContent);
+        selectedRow = row;
+    });
+
+    // Open "Edit Task" Modal
+    editTaskBtn.addEventListener("click", function () {
+        if (!selectedTaskId || !selectedRow) return;
+
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        let selectedTask = tasks.find(task => task.id === selectedTaskId);
+        if (!selectedTask) return;
+
+        // Load projects & students before showing modal
+        loadProjectsAndStudentsForEdit();
+
+        // Open modal
+        editTaskModal.style.display = "flex";
+        modalOverlay.style.display = "block";
+
+        // Pre-fill modal fields
+        document.getElementById("editProject").value = selectedTask.project;
+        document.getElementById("editTaskName").value = selectedTask.taskName;
+        document.getElementById("editDescription").value = selectedTask.description;
+        document.getElementById("editAssignedStudent").value = selectedTask.assignedStudent;
+        document.getElementById("editStatus").value = selectedTask.status;
+        document.getElementById("editDueDate").value = selectedTask.dueDate;
+
+        document.getElementById("editTaskForm").setAttribute("data-editing-id", selectedTaskId);
+    });
+
+    // Close "Edit Task" Modal
+    closeEditModal.addEventListener("click", function () {
+        editTaskModal.style.display = "none";
+        modalOverlay.style.display = "none";
+    });
+
+    // Handle "Edit Task" Form Submission
+    document.getElementById("editTaskForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        const editingId = document.getElementById("editTaskForm").getAttribute("data-editing-id");
+
+        const updatedTask = {
+            id: parseInt(editingId),
+            project: document.getElementById("editProject").value,
+            taskName: document.getElementById("editTaskName").value,
+            description: document.getElementById("editDescription").value,
+            assignedStudent: document.getElementById("editAssignedStudent").value,
+            status: document.getElementById("editStatus").value,
+            dueDate: document.getElementById("editDueDate").value
+        };
+
+        // Update localStorage
+        let taskIndex = tasks.findIndex(task => task.id === parseInt(editingId));
+        if (taskIndex !== -1) {
+            tasks[taskIndex] = updatedTask;
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+
+        // Update the selected row in the table instantly
+        if (selectedRow) {
+            selectedRow.cells[1].textContent = updatedTask.project;
+            selectedRow.cells[2].textContent = updatedTask.taskName;
+            selectedRow.cells[3].textContent = updatedTask.description;
+            selectedRow.cells[4].textContent = updatedTask.assignedStudent;
+            selectedRow.cells[5].textContent = updatedTask.status;
+            selectedRow.cells[6].textContent = updatedTask.dueDate;
+
+            selectedRow.classList.remove("selected");
+            selectedRow = null;
+        }
+
+        // Disable the "Edit Task" button after editing
+        editTaskBtn.setAttribute("disabled", "true");
+
+        // Close Modal
+        editTaskModal.style.display = "none";
+        modalOverlay.style.display = "none";
+    });
+
+    // Ensure table updates when page loads
+    function loadTasksFromStorage() {
+        tableBody.innerHTML = ""; // Clear the table
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+        tasks.forEach(task => {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td>${task.id}</td>
+                <td>${task.project}</td>
+                <td>${task.taskName}</td>
+                <td>${task.description}</td>
+                <td>${task.assignedStudent}</td>
+                <td class="status ${task.status.toLowerCase()}">${task.status}</td>
+                <td>${task.dueDate}</td>
+            `;
+            tableBody.appendChild(newRow);
+        });
+    }
+
+    // Load tasks initially
+    loadTasksFromStorage();
+});
+
+
+
 
 
 
@@ -624,214 +779,212 @@ overlay.addEventListener("click", function () {
 
 
 
-
-
-
-
-
-
 /////////////////////////////////////*** ✅  project tab ///////////////////////
 document.addEventListener("DOMContentLoaded", function () {
-const projectContainer = document.getElementById("projectContainer");
-const projectForm = document.getElementById("projectForm");
-const modal = document.getElementById("projectModal");
-const overlay = document.querySelector(".modal-overlay");
-const addProjectBtn = document.querySelector(".add-project-btn");
-const closeModalBtn = document.querySelector(".modal .close");
-const projectSearch = document.getElementById("projectSearch");
-const projectStatusFilter = document.getElementById("projectStatusFilter");
-const studentsList = document.getElementById("studentsList");
+    const projectContainer = document.getElementById("projectContainer");
+    const projectForm = document.getElementById("projectForm");
+    const modal = document.getElementById("projectModal");
+    const overlay = document.querySelector(".modal-overlay");
+    const addProjectBtn = document.querySelector(".add-project-btn");
+    const closeModalBtn = document.querySelector(".modal .close");
+    const projectSearch = document.getElementById("projectSearch");
+    const projectStatusFilter = document.getElementById("projectStatusFilter");
+    const studentsList = document.getElementById("studentsList");
 
+    // Retrieve users from localStorage
+    const users = JSON.parse(localStorage.getItem("users")) || [];
 
-// Retrieve users from localStorage
-const users = JSON.parse(localStorage.getItem("users")) || [];
+    // Filter only students
+    const students = users.filter(user => user.role === "Student");
 
-// Filter only students
-const students = users.filter(user => user.role === "Student");
-
-// Populate the students dropdown list
-if (students.length > 0) {
-    studentsList.innerHTML = ""; // Clear existing options
-    students.forEach(student => {
-        const option = document.createElement("option");
-        option.textContent = student.username;
-        option.value = student.username;
-        studentsList.appendChild(option);
-    });
-} else {
-    studentsList.innerHTML = "<option>No students registered</option>";
-}
-
-
-// Load projects from localStorage or use default sample projects
-let projects = JSON.parse(localStorage.getItem("projects")) || [
-    {
-        title: "Website Redesign",
-        description: "Redesign the company website to improve user experience.",
-        students: ["Student 1", "Student 2"],
-        category: "Web Development",
-        startDate: "2023-01-01",
-        endDate: "2023-06-01",
-        status: "Completed", // Ensure it matches exactly
-        progress: 100,
-        borderColor: "orange"
-    },
-    {
-        title: "Mobile App Development",
-        description: "Develop a mobile application for our services.",
-        students: ["Student 3", "Student 4"],
-        category: "Mobile Development",
-        startDate: "2023-02-15",
-        endDate: "2023-08-15",
-        status: "Completed",
-        progress: 100,
-        borderColor: "orange"
-    },
-    {
-        title: "Machine Learning Model",
-        description: "Create a machine learning model for predictions.",
-        students: ["Student 1", "Student 3"],
-        category: "AI & ML",
-        startDate: "2023-04-01",
-        endDate: "2023-09-01",
-        status: "In-Progress",
-        progress: 50,
-        borderColor: "blue"
-    },
-    {
-        title: "AI Security System",
-        description: "Build an AI system for real-time security monitoring.",
-        students: ["Student 2", "Student 4"],
-        category: "AI & ML",
-        startDate: "2023-07-01",
-        endDate: "2024-01-01",
-        status: "Pending",
-        progress: 0,
-        borderColor: "gray"
-    }
-];
-
-
-// Function to save projects to localStorage
-function saveProjectsToStorage() {
-    localStorage.setItem("projects", JSON.stringify(projects));
-}
-
-// Function to Render Projects
-function renderProjects(filteredProjects = projects) {
-    projectContainer.innerHTML = ""; // Clear existing content
-
-    if (filteredProjects.length === 0) {
-        projectContainer.innerHTML = `<p style="color: white;">No projects found.</p>`;
-        return;
+    // Populate the students dropdown list
+    if (students.length > 0) {
+        studentsList.innerHTML = ""; // Clear existing options
+        students.forEach(student => {
+            const option = document.createElement("option");
+            option.textContent = student.username;
+            option.value = student.username;
+            studentsList.appendChild(option);
+        });
+    } else {
+        studentsList.innerHTML = "<option>No students registered</option>";
     }
 
-    filteredProjects.forEach((project, index) => {
-        const projectCard = document.createElement("div");
-        projectCard.classList.add("project-card");
-        projectCard.style.border = `2px solid ${project.borderColor}`;
+    // Load projects from localStorage or use default sample projects
+    let projects = JSON.parse(localStorage.getItem("projects")) || [
+        {
+            title: "Website Redesign",
+            description: "Redesign the company website to improve user experience.",
+            students: ["Student 1", "Student 2"],
+            category: "Web Development",
+            startDate: "2023-01-01",
+            endDate: "2023-06-01",
+            status: "Completed",
+            progress: 100,
+            borderColor: "orange"
+        },
+        {
+            title: "Mobile App Development",
+            description: "Develop a mobile application for our services.",
+            students: ["Student 3", "Student 4"],
+            category: "Mobile Development",
+            startDate: "2023-02-15",
+            endDate: "2023-08-15",
+            status: "Completed",
+            progress: 100,
+            borderColor: "orange"
+        },
+        {
+            title: "Machine Learning Model",
+            description: "Create a machine learning model for predictions.",
+            students: ["Student 1", "Student 3"],
+            category: "AI & ML",
+            startDate: "2023-04-01",
+            endDate: "2023-09-01",
+            status: "In-Progress",
+            progress: 50,
+            borderColor: "blue"
+        },
+        {
+            title: "AI Security System",
+            description: "Build an AI system for real-time security monitoring.",
+            students: ["Student 2", "Student 4"],
+            category: "AI & ML",
+            startDate: "2023-07-01",
+            endDate: "2024-01-01",
+            status: "Pending",
+            progress: 0,
+            borderColor: "gray"
+        }
+    ];
 
-        projectCard.innerHTML = `
-            <h3 style="color:${project.borderColor}">${project.title}</h3>
-            <p><strong>Description:</strong> ${project.description}</p>
-            <p><strong>Students:</strong> ${project.students.join(", ")}</p>
-            <p><strong>Category:</strong> ${project.category}</p>
-            <p><strong>Status:</strong> ${project.status}</p>
-            <div class="progress-bar">
-                <div class="progress" style="width:${project.progress}%">${project.progress}%</div>
-            </div>
-            <p>${project.startDate} &nbsp;&nbsp;&nbsp; ${project.endDate}</p>
-            <button class="delete-project-btn" data-index="${index}">Delete</button>
-        `;
+    // Function to save projects to localStorage
+    function saveProjectsToStorage() {
+        localStorage.setItem("projects", JSON.stringify(projects));
+    }
 
-        projectContainer.appendChild(projectCard);
-    });
-
-    // Add delete functionality
-    document.querySelectorAll(".delete-project-btn").forEach(button => {
-        button.addEventListener("click", function () {
-            const index = this.getAttribute("data-index");
+    // Function to delete a project
+    function deleteProject(index) {
+        if (confirm("Are you sure you want to delete this project?")) {
             projects.splice(index, 1); // Remove project from array
             saveProjectsToStorage(); // Update localStorage
             renderProjects(); // Re-render projects
-        });
-    });
-}
-
-// Function to Filter Projects Based on Search and Status
-function filterProjects() {
-    const searchTerm = projectSearch.value.toLowerCase().trim();
-    const selectedStatus = projectStatusFilter.value.trim(); 
-
-    const filteredProjects = projects.filter(project => {
-        const matchesSearch = project.title.toLowerCase().includes(searchTerm) ||  project.description.toLowerCase().includes(searchTerm);
-
-        const matchesStatus = selectedStatus === "all" || project.status.toLowerCase() === selectedStatus.toLowerCase();
-
-        return matchesSearch && matchesStatus;
-    });
-
-    renderProjects(filteredProjects);
-}
-
-// Event Listeners for Search and Filter
-projectSearch.addEventListener("input", filterProjects);
-projectStatusFilter.addEventListener("change", filterProjects);
-
-// Function to Handle Form Submission (Adding New Project)
-projectForm.addEventListener("submit", function (event) {
-    event.preventDefault(); // Prevent default form submission
-
-    const title = document.getElementById("projectTitle").value;
-    const description = document.getElementById("projectDescription").value;
-    const students = Array.from(document.getElementById("studentsList").selectedOptions).map(option => option.value);
-    const category = document.getElementById("projectCategory").value;
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
-    const status = document.getElementById("projectStatus").value.trim(); 
-
-    if (!title || !description || students.length === 0 || category === "Select a category" || !startDate || !endDate) {
-        alert("Please fill in all fields.");
-        return;
+        }
     }
 
-    const borderColor = status === "Completed" ? "orange" : status === "In-Progress" ? "blue" : "gray";
-    const progress = status === "Completed" ? 100 : status === "In-Progress" ? 50 : 0;
+    // Function to render projects
+    function renderProjects(filteredProjects = projects) {
+        projectContainer.innerHTML = ""; // Clear existing content
 
-    // Add new project to array
-    projects.push({ title, description, students, category, startDate, endDate, status, progress, borderColor });
+        if (filteredProjects.length === 0) {
+            projectContainer.innerHTML = `<p style="color: white;">No projects found.</p>`;
+            return;
+        }
 
-    // Save to localStorage
-    saveProjectsToStorage();
+        filteredProjects.forEach((project, index) => {
+            const projectCard = document.createElement("div");
+            projectCard.classList.add("project-card");
+            projectCard.style.border = `2px solid ${project.borderColor}`;
 
-    // Refresh Project List
+            projectCard.innerHTML = `
+                <h3 style="color:${project.borderColor}">${project.title}</h3>
+                <p><strong>Description:</strong> ${project.description}</p>
+                <p><strong>Students:</strong> ${project.students.join(", ")}</p>
+                <p><strong>Category:</strong> ${project.category}</p>
+                <p><strong>Status:</strong> ${project.status}</p>
+                <div class="progress-bar">
+                    <div class="progress" style="width:${project.progress}%">${project.progress}%</div>
+                </div>
+                <p>${project.startDate} &nbsp;&nbsp;&nbsp; ${project.endDate}</p>
+                
+            `;
+
+            projectContainer.appendChild(projectCard);
+        });
+
+      
+        
+    }
+
+    // Function to filter projects based on search and status
+    function filterProjects() {
+        const searchTerm = projectSearch.value.toLowerCase().trim();
+        const selectedStatus = projectStatusFilter.value.trim();
+
+        const filteredProjects = projects.filter(project => {
+            const matchesSearch = project.title.toLowerCase().includes(searchTerm) || project.description.toLowerCase().includes(searchTerm);
+            const matchesStatus = selectedStatus === "all" || project.status.toLowerCase() === selectedStatus.toLowerCase();
+            return matchesSearch && matchesStatus;
+        });
+
+        renderProjects(filteredProjects);
+    }
+
+    // Event listeners for search and filter
+    projectSearch.addEventListener("input", filterProjects);
+    projectStatusFilter.addEventListener("change", filterProjects);
+
+    // Function to handle form submission (adding new project)
+    projectForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const title = document.getElementById("projectTitle").value;
+        const description = document.getElementById("projectDescription").value;
+        const students = Array.from(document.getElementById("studentsList").selectedOptions).map(option => option.value);
+        const category = document.getElementById("projectCategory").value;
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+        const status = document.getElementById("projectStatus").value.trim();
+
+        if (!title || !description || students.length === 0 || category === "Select a category" || !startDate || !endDate) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        const borderColor = status === "Completed" ? "orange" : status === "In-Progress" ? "blue" : "gray";
+        const progress = status === "Completed" ? 100 : status === "In-Progress" ? 50 : 0;
+
+        // Add new project to array
+        projects.push({ title, description, students, category, startDate, endDate, status, progress, borderColor });
+
+        // Save to localStorage
+        saveProjectsToStorage();
+
+        // Refresh Project List
+        renderProjects();
+        projectForm.reset();
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+
+    // Open/Close Modal
+    addProjectBtn.addEventListener("click", function () {
+        modal.style.display = "block";
+        overlay.style.display = "block";
+    });
+
+    closeModalBtn.addEventListener("click", function () {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+
+    overlay.addEventListener("click", function () {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+
+    // Load projects on page load
     renderProjects();
-    projectForm.reset();
-    modal.style.display = "none";
-    overlay.style.display = "none";
 });
 
-// Open/Close Modal
-addProjectBtn.addEventListener("click", function () {
-    modal.style.display = "block";
-    overlay.style.display = "block";
-});
-
-closeModalBtn.addEventListener("click", function () {
-    modal.style.display = "none";
-    overlay.style.display = "none";
-});
-
-overlay.addEventListener("click", function () {
-    modal.style.display = "none";
-    overlay.style.display = "none";
-});
-
-// Load Projects on Page Load
-renderProjects();
-});
 
 /////////////////////////////////////*** ✅  project tab ///////////////////////
+
+
+
+
+
+
 
 
 ///////////////////////////////////// ✅ delete task ///////////////////////
@@ -1077,6 +1230,12 @@ filterTasks();
 
 
 
+
+
+
+
+
+
 ///////////////////////////////////// ✅ sign is as a student ///////////////////////
 
 
@@ -1162,153 +1321,3 @@ function displayProjectDetails(projectTitle) {
 
 
 
-///////////////////////////////////// ✅ edit task ///////////////////////
-document.addEventListener("DOMContentLoaded", function () {
-    const tableBody = document.querySelector(".tasks-table tbody");
-    const editTaskBtn = document.querySelector(".edit-task-btn");
-    const editTaskModal = document.getElementById("editTaskModal");
-    const closeEditModal = editTaskModal.querySelector(".close");
-    const modalOverlay = document.querySelector(".modal-overlay");
-    let selectedTaskId = null;
-    let selectedRow = null;
-
-    // Function to Load Projects & Students into Edit Modal
-    function loadProjectsAndStudentsForEdit() {
-        let projectSelect = document.getElementById("editProject");
-        let studentSelect = document.getElementById("editAssignedStudent");
-
-        // Load projects from localStorage
-        let projects = JSON.parse(localStorage.getItem("projects")) || [];
-        projectSelect.innerHTML = '<option selected disabled value="">Select a project</option>';
-        projects.forEach(project => {
-            let option = document.createElement("option");
-            option.value = project.title;
-            option.textContent = project.title;
-            projectSelect.appendChild(option);
-        });
-
-        // Load students from localStorage
-        let users = JSON.parse(localStorage.getItem("users")) || [];
-        let students = users.filter(user => user.role === "Student");
-        studentSelect.innerHTML = '<option selected disabled value="">Select a student</option>';
-        students.forEach(student => {
-            let option = document.createElement("option");
-            option.value = student.username;
-            option.textContent = student.username;
-            studentSelect.appendChild(option);
-        });
-    }
-
-    // Select task row and enable "Edit Task" button
-    tableBody.addEventListener("click", function (event) {
-        const row = event.target.closest("tr");
-        if (!row) return;
-
-        document.querySelectorAll(".tasks-table tbody tr").forEach(r => r.classList.remove("selected"));
-        row.classList.add("selected");
-        editTaskBtn.removeAttribute("disabled");
-
-        selectedTaskId = parseInt(row.cells[0].textContent);
-        selectedRow = row;
-    });
-
-    // Open "Edit Task" Modal
-    editTaskBtn.addEventListener("click", function () {
-        if (!selectedTaskId || !selectedRow) return;
-
-        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-        let selectedTask = tasks.find(task => task.id === selectedTaskId);
-        if (!selectedTask) return;
-
-        // Load projects & students before showing modal
-        loadProjectsAndStudentsForEdit();
-
-        // Open modal
-        editTaskModal.style.display = "flex";
-        modalOverlay.style.display = "block";
-
-        // Pre-fill modal fields
-        document.getElementById("editProject").value = selectedTask.project;
-        document.getElementById("editTaskName").value = selectedTask.taskName;
-        document.getElementById("editDescription").value = selectedTask.description;
-        document.getElementById("editAssignedStudent").value = selectedTask.assignedStudent;
-        document.getElementById("editStatus").value = selectedTask.status;
-        document.getElementById("editDueDate").value = selectedTask.dueDate;
-
-        document.getElementById("editTaskForm").setAttribute("data-editing-id", selectedTaskId);
-    });
-
-    // Close "Edit Task" Modal
-    closeEditModal.addEventListener("click", function () {
-        editTaskModal.style.display = "none";
-        modalOverlay.style.display = "none";
-    });
-
-    // Handle "Edit Task" Form Submission
-    document.getElementById("editTaskForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-        const editingId = document.getElementById("editTaskForm").getAttribute("data-editing-id");
-
-        const updatedTask = {
-            id: parseInt(editingId),
-            project: document.getElementById("editProject").value,
-            taskName: document.getElementById("editTaskName").value,
-            description: document.getElementById("editDescription").value,
-            assignedStudent: document.getElementById("editAssignedStudent").value,
-            status: document.getElementById("editStatus").value,
-            dueDate: document.getElementById("editDueDate").value
-        };
-
-        // Update localStorage
-        let taskIndex = tasks.findIndex(task => task.id === parseInt(editingId));
-        if (taskIndex !== -1) {
-            tasks[taskIndex] = updatedTask;
-            localStorage.setItem("tasks", JSON.stringify(tasks));
-        }
-
-        // Update the selected row in the table instantly
-        if (selectedRow) {
-            selectedRow.cells[1].textContent = updatedTask.project;
-            selectedRow.cells[2].textContent = updatedTask.taskName;
-            selectedRow.cells[3].textContent = updatedTask.description;
-            selectedRow.cells[4].textContent = updatedTask.assignedStudent;
-            selectedRow.cells[5].textContent = updatedTask.status;
-            selectedRow.cells[6].textContent = updatedTask.dueDate;
-
-            selectedRow.classList.remove("selected");
-            selectedRow = null;
-        }
-
-        // Disable the "Edit Task" button after editing
-        editTaskBtn.setAttribute("disabled", "true");
-
-        // Close Modal
-        editTaskModal.style.display = "none";
-        modalOverlay.style.display = "none";
-    });
-
-    // Ensure table updates when page loads
-    function loadTasksFromStorage() {
-        tableBody.innerHTML = ""; // Clear the table
-        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
-        tasks.forEach(task => {
-            const newRow = document.createElement("tr");
-            newRow.innerHTML = `
-                <td>${task.id}</td>
-                <td>${task.project}</td>
-                <td>${task.taskName}</td>
-                <td>${task.description}</td>
-                <td>${task.assignedStudent}</td>
-                <td class="status ${task.status.toLowerCase()}">${task.status}</td>
-                <td>${task.dueDate}</td>
-            `;
-            tableBody.appendChild(newRow);
-        });
-    }
-
-    // Load tasks initially
-    loadTasksFromStorage();
-});
