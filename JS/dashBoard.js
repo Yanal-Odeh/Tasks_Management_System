@@ -817,37 +817,6 @@ if (logoutBtn) {
 /////////////////////////////////////*** ✅ add span name//////////////////////////////////
 
 
-/////////////////////////////////////*** ✅ project Modal Handling //////////////////////////////////
-
-document.addEventListener("DOMContentLoaded", function () {
-const modal = document.getElementById("projectModal");
-const overlay = document.querySelector(".modal-overlay");
-const openModalBtn = document.querySelector(".add-project-btn");
-const closeModalBtn = document.querySelector(".modal .close");
-
-// Open modal
-openModalBtn.addEventListener("click", function () {
-    modal.style.display = "block";
-    overlay.style.display = "block";
-});
-
-// Close modal
-closeModalBtn.addEventListener("click", function () {
-    modal.style.display = "none";
-    overlay.style.display = "none";
-});
-
-// Close modal when clicking outside
-overlay.addEventListener("click", function () {
-    modal.style.display = "none";
-    overlay.style.display = "none";
-});
-});
-
-
-/////////////////////////////////////*** ✅ Project Modal Handling //////////////////////////////////
-
-
 
 /////////////////////////////////////*** ✅  project tab ///////////////////////
 document.addEventListener("DOMContentLoaded", function () {
@@ -1037,6 +1006,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /////////////////////////////////////*** ✅  project tab ///////////////////////
 
+
+
+/////////////////////////////////////*** ✅ project Modal Handling //////////////////////////////////
+
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("projectModal");
+    const overlay = document.querySelector(".modal-overlay");
+    const openModalBtn = document.querySelector(".add-project-btn");
+    const closeModalBtn = document.querySelector(".modal .close");
+    
+    // Open modal
+    openModalBtn.addEventListener("click", function () {
+        modal.style.display = "block";
+        overlay.style.display = "block";
+    });
+    
+    // Close modal
+    closeModalBtn.addEventListener("click", function () {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+    
+    // Close modal when clicking outside
+    overlay.addEventListener("click", function () {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+    });
+    
+    
+    /////////////////////////////////////*** ✅ Project Modal Handling //////////////////////////////////
+    
+    
 
 
 
