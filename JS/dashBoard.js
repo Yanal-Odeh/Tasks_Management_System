@@ -527,7 +527,7 @@ function changeMode() {
 
 
 
-/////////////////////////////////////*** ✅ add admin span name//////////////////////////////////
+/////////////////////////////////////*** ✅ add span name//////////////////////////////////
 document.addEventListener("DOMContentLoaded", () => {
     // Get current user details from sessionStorage or localStorage
     const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
@@ -560,7 +560,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-/////////////////////////////////////*** ✅ add admin span name//////////////////////////////////
+/////////////////////////////////////*** ✅ add span name//////////////////////////////////
 
 
 /////////////////////////////////////*** ✅ project Modal Handling //////////////////////////////////
@@ -1115,6 +1115,10 @@ document.addEventListener("DOMContentLoaded", function () {
             <p><strong>Students:</strong> ${project.students.join(", ")}</p>
             <p><strong>Start Date:</strong> ${project.startDate}</p>
             <p><strong>End Date:</strong> ${project.endDate}</p>
+            <h3>Progress</h3>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: ${project.progress}%;">${project.progress}%</div>
+            </div>
             <h3>Tasks</h3>
         `;
 
