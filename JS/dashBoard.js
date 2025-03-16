@@ -136,6 +136,92 @@ if (isAdmin) {
 });
 
 
+/////////////////////////////////////////////chart.js//////////////////////////////////////////////
+document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve user session
+    const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
+    
+    if (!userData) {
+        window.location.assign("../Signin.html"); // Redirect if not logged in
+        return;
+    }
+    
+    const user = JSON.parse(userData);
+    const isAdmin = user.role === "Admin";
+    
+    // Retrieve data from localStorage
+    let projects = JSON.parse(localStorage.getItem("projects")) || [];
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    
+    // For admin: Get total student count
+    let students = users.filter(user => user.role === "Student");
+    
+    // For admin: Get completed projects
+    let finishedProjects = projects.filter(project => project.status.toLowerCase() === "completed");
+    
+    let chartLabels, chartData;
+    
+    if (isAdmin) {
+        // Admin sees everything
+        chartLabels = ["Number of Projects", "Number of Students", "Number of Tasks", "Number of Finished Projects"];
+        chartData = [projects.length, students.length, tasks.length, finishedProjects.length];
+    } else {
+        // Student sees only their assigned projects and tasks
+        let studentProjects = projects.filter(project => project.students.includes(user.username));
+        let studentTasks = tasks.filter(task => task.assignedStudent.toLowerCase() === user.username.toLowerCase());
+        let studentFinishedProjects = studentProjects.filter(project => project.status.toLowerCase() === "completed");
+    
+        chartLabels = ["Number of Projects", "Number of Tasks", "Number of Finished Projects"];
+        chartData = [studentProjects.length, studentTasks.length, studentFinishedProjects.length];
+    }
+    
+    // Chart Data
+    const ctx = document.getElementById("myChart").getContext("2d");
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: chartLabels, // Dynamic labels based on role
+            datasets: [{
+                label: "Count",
+                data: chartData, // Dynamic data based on role
+                backgroundColor: [
+                    "rgba(47, 138, 230, 0.5)", 
+                    "rgba(216, 189, 39, 0.5)", 
+                    "rgba(139, 69, 19, 0.5)", 
+                    "rgba(128, 0, 128, 0.5)"
+                ],
+                borderColor: [
+                    "rgba(0, 100, 200, 1)", 
+                    "rgba(255, 215, 0, 1)", 
+                    "rgba(139, 69, 19, 1)", 
+                    "rgba(128, 0, 128, 1)"
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#ddd" // Light gray legend text for dark background
+                    }
+                }
+            }
+        }
+    });
+    });
+    
+    
+    
+    /////////////////////////////////////////////chart.js//////////////////////////////////////////////
+
+
 ///////////////////////////////////// ✅ edit task ///////////////////////
 document.addEventListener("DOMContentLoaded", function () {
     const tableBody = document.querySelector(".tasks-table tbody");
@@ -294,90 +380,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-/////////////////////////////////////////////chart.js//////////////////////////////////////////////
-document.addEventListener("DOMContentLoaded", function () {
-// Retrieve user session
-const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
-
-if (!userData) {
-    window.location.assign("../Signin.html"); // Redirect if not logged in
-    return;
-}
-
-const user = JSON.parse(userData);
-const isAdmin = user.role === "Admin";
-
-// Retrieve data from localStorage
-let projects = JSON.parse(localStorage.getItem("projects")) || [];
-let users = JSON.parse(localStorage.getItem("users")) || [];
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
-// For admin: Get total student count
-let students = users.filter(user => user.role === "Student");
-
-// For admin: Get completed projects
-let finishedProjects = projects.filter(project => project.status.toLowerCase() === "completed");
-
-let chartLabels, chartData;
-
-if (isAdmin) {
-    // Admin sees everything
-    chartLabels = ["Number of Projects", "Number of Students", "Number of Tasks", "Number of Finished Projects"];
-    chartData = [projects.length, students.length, tasks.length, finishedProjects.length];
-} else {
-    // Student sees only their assigned projects and tasks
-    let studentProjects = projects.filter(project => project.students.includes(user.username));
-    let studentTasks = tasks.filter(task => task.assignedStudent.toLowerCase() === user.username.toLowerCase());
-    let studentFinishedProjects = studentProjects.filter(project => project.status.toLowerCase() === "completed");
-
-    chartLabels = ["Number of Projects", "Number of Tasks", "Number of Finished Projects"];
-    chartData = [studentProjects.length, studentTasks.length, studentFinishedProjects.length];
-}
-
-// Chart Data
-const ctx = document.getElementById("myChart").getContext("2d");
-new Chart(ctx, {
-    type: "bar",
-    data: {
-        labels: chartLabels, // Dynamic labels based on role
-        datasets: [{
-            label: "Count",
-            data: chartData, // Dynamic data based on role
-            backgroundColor: [
-                "rgba(47, 138, 230, 0.5)", 
-                "rgba(216, 189, 39, 0.5)", 
-                "rgba(139, 69, 19, 0.5)", 
-                "rgba(128, 0, 128, 0.5)"
-            ],
-            borderColor: [
-                "rgba(0, 100, 200, 1)", 
-                "rgba(255, 215, 0, 1)", 
-                "rgba(139, 69, 19, 1)", 
-                "rgba(128, 0, 128, 1)"
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: { beginAtZero: true }
-        },
-        plugins: {
-            legend: {
-                labels: {
-                    color: "#ddd" // Light gray legend text for dark background
-                }
-            }
-        }
-    }
-});
-});
-
-
-
-/////////////////////////////////////////////chart.js//////////////////////////////////////////////
 
 
 
@@ -395,6 +397,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const sortSelect = document.getElementById("sortTasks");
     const assignedStudentSelect = document.getElementById("assignedStudent");
     const projectSelect = document.getElementById("project");
+    const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
+    if (!userData) {
+        window.location.assign("../Signin.html"); // Redirect if not logged in
+        return;
+    }
+    const user = JSON.parse(userData);
+    const isAdmin = user.role === "Admin";
 
     const statusPriority = {
         "completed": 1,    
@@ -407,10 +416,12 @@ document.addEventListener("DOMContentLoaded", function () {
     modal.style.display = "none";
     overlay.style.display = "none";
 
+
     function toggleModal(show) {
         modal.style.display = show ? "flex" : "none";
         overlay.style.display = show ? "block" : "none";
     }
+
 
     openModalBtn.addEventListener("click", () => {
         taskForm.reset();
@@ -832,7 +843,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Populate the students dropdown list
     if (students.length > 0) {
-        studentsList.innerHTML = ""; // Clear existing options
+        studentsList.innerHTML = "";
         students.forEach(student => {
             const option = document.createElement("option");
             option.textContent = student.username;
@@ -843,71 +854,52 @@ document.addEventListener("DOMContentLoaded", function () {
         studentsList.innerHTML = "<option>No students registered</option>";
     }
 
-    // Load projects from localStorage or use default sample projects
-    let projects = JSON.parse(localStorage.getItem("projects")) || [
-        {
-            title: "Website Redesign",
-            description: "Redesign the company website to improve user experience.",
-            students: ["Student 1", "Student 2"],
-            category: "Web Development",
-            startDate: "2023-01-01",
-            endDate: "2023-06-01",
-            status: "Completed",
-            progress: 100,
-            borderColor: "orange"
-        },
-        {
-            title: "Mobile App Development",
-            description: "Develop a mobile application for our services.",
-            students: ["Student 3", "Student 4"],
-            category: "Mobile Development",
-            startDate: "2023-02-15",
-            endDate: "2023-08-15",
-            status: "Completed",
-            progress: 100,
-            borderColor: "orange"
-        },
-        {
-            title: "Machine Learning Model",
-            description: "Create a machine learning model for predictions.",
-            students: ["Student 1", "Student 3"],
-            category: "AI & ML",
-            startDate: "2023-04-01",
-            endDate: "2023-09-01",
-            status: "In-Progress",
-            progress: 50,
-            borderColor: "blue"
-        },
-        {
-            title: "AI Security System",
-            description: "Build an AI system for real-time security monitoring.",
-            students: ["Student 2", "Student 4"],
-            category: "AI & ML",
-            startDate: "2023-07-01",
-            endDate: "2024-01-01",
-            status: "Pending",
-            progress: 0,
-            borderColor: "gray"
-        }
-    ];
+    // Load projects from localStorage
+    let projects = JSON.parse(localStorage.getItem("projects")) || [];
 
     // Function to save projects to localStorage
     function saveProjectsToStorage() {
         localStorage.setItem("projects", JSON.stringify(projects));
     }
 
-    // Function to delete a project
+    // Function to delete a project AND its related tasks
     function deleteProject(index) {
-        if (confirm("Are you sure you want to delete this project?")) {
-            projects.splice(index, 1); // Remove project from array
-            saveProjectsToStorage(); // Update localStorage
-            renderProjects(); // Re-render projects
+        if (confirm("Are you sure you want to delete this project? All related tasks will also be removed.")) {
+            const deletedProjectTitle = projects[index].title;
+
+            // Remove project from the array
+            projects.splice(index, 1);
+
+            // Update localStorage for projects
+            saveProjectsToStorage();
+
+            // Delete tasks related to this project
+            deleteTasksForProject(deletedProjectTitle);
+
+            // Re-render projects and tasks
+            renderProjects();
+        }
+    }
+
+    // Function to delete all tasks related to a deleted project
+    function deleteTasksForProject(projectTitle) {
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        
+        // Filter out tasks related to the deleted project
+        tasks = tasks.filter(task => task.project !== projectTitle);
+
+        // Save updated tasks back to localStorage
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+
+        // Refresh tasks UI (if applicable)
+        if (typeof loadTasks === "function") {
+            loadTasks();
         }
     }
 
     // Function to render projects
     function renderProjects(filteredProjects = projects) {
-        projectContainer.innerHTML = ""; // Clear existing content
+        projectContainer.innerHTML = "";
 
         if (filteredProjects.length === 0) {
             projectContainer.innerHTML = `<p style="color: white;">No projects found.</p>`;
@@ -929,14 +921,19 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="progress" style="width:${project.progress}%">${project.progress}%</div>
                 </div>
                 <p>${project.startDate} &nbsp;&nbsp;&nbsp; ${project.endDate}</p>
-                
+                <button class="delete-btn" data-index="${index}">❌ Delete</button>
             `;
 
             projectContainer.appendChild(projectCard);
         });
 
-      
-        
+        // Add event listeners for delete buttons
+        document.querySelectorAll(".delete-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const index = this.getAttribute("data-index");
+                deleteProject(index);
+            });
+        });
     }
 
     // Function to filter projects based on search and status
@@ -959,7 +956,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to handle form submission (adding new project)
     projectForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent default form submission
+        event.preventDefault();
 
         const title = document.getElementById("projectTitle").value;
         const description = document.getElementById("projectDescription").value;
@@ -1009,6 +1006,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Load projects on page load
     renderProjects();
 });
+
 
 
 /////////////////////////////////////*** ✅  project tab ///////////////////////
@@ -1474,148 +1472,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-///////////////////////////////////// delete project  ///////////////////////
-document.addEventListener("DOMContentLoaded", function () {
-    const projectContainer = document.getElementById("projectContainer"); // The div where project cards exist
-    const deleteProjectBtn = document.querySelector(".delete-project-btn"); // Delete button
-    let selectedProject = null; // Stores the selected project for deletion
 
-    // ✅ Hide delete button if the user is a student
-    const userRole = localStorage.getItem("userRole"); // Assume user role is stored
-    if (userRole === "student") {
-        deleteProjectBtn.style.display = "none";
-    }
-
-    // ✅ Function to Disable Delete Button (Gray Out)
-    function disableDeleteButton() {
-        deleteProjectBtn.setAttribute("disabled", "true");
-        deleteProjectBtn.style.backgroundColor = "#ccc"; // Gray color
-        deleteProjectBtn.style.cursor = "not-allowed";
-    }
-
-    // ✅ Function to Enable Delete Button (Restore Color)
-    function enableDeleteButton() {
-        deleteProjectBtn.removeAttribute("disabled");
-        deleteProjectBtn.style.backgroundColor = "rgb(8, 113, 224)"; // Original blue color
-        deleteProjectBtn.style.cursor = "pointer";
-    }
-
-    // ✅ Disable delete button initially
-    disableDeleteButton();
-
-    // ✅ Function to Select a Project Card on Left Click
-    projectContainer.addEventListener("click", function (event) {
-        const projectCard = event.target.closest(".project-card"); // Get the clicked project
-        if (!projectCard || projectCard === selectedProject) return; // Prevent reselecting the same one
-
-        // Remove selection from other projects
-        document.querySelectorAll(".project-card").forEach(card => card.classList.remove("selected"));
-
-        // Highlight selected project
-        projectCard.classList.add("selected");
-        selectedProject = projectCard;
-        enableDeleteButton(); // Enable delete button
-    });
-
-    // ✅ Function to Deselect a Project Card on Right Click
-    projectContainer.addEventListener("contextmenu", function (event) {
-        event.preventDefault(); // Prevent default right-click menu
-
-        // Remove selection
-        document.querySelectorAll(".project-card").forEach(card => card.classList.remove("selected"));
-        selectedProject = null;
-
-        // Disable delete button
-        disableDeleteButton();
-    });
-
-    // ✅ Function to Delete a Selected Project & Its Related Tasks
-    deleteProjectBtn.addEventListener("click", function () {
-        if (!selectedProject) return;
-
-        const confirmDelete = confirm("⚠️ Are you sure you want to delete this project and all related tasks?");
-        if (!confirmDelete) return;
-
-        const projectId = parseInt(selectedProject.dataset.id); // Assuming each project card has a data-id
-
-        // Remove project from UI
-        selectedProject.remove();
-
-        // Remove project from Local Storage
-        let projects = getProjectsFromStorage();
-        projects = projects.filter(project => project.id !== projectId);
-        saveProjectsToStorage(projects);
-
-        // ✅ Remove related tasks from Local Storage
-        let tasks = getTasksFromStorage();
-        tasks = tasks.filter(task => task.projectId !== projectId); // Keep only tasks not related to this project
-        saveTasksToStorage(tasks);
-
-        // ✅ Reload tasks table/UI
-        loadTasksFromStorage();
-
-        // ✅ Auto-deselect after deleting
-        selectedProject = null;
-        disableDeleteButton(); // Disable delete button (Gray Out)
-    });
-
-    // ✅ Auto-deselect all projects when the page loads
-    document.querySelectorAll(".project-card").forEach(card => card.classList.remove("selected"));
-    selectedProject = null;
-    disableDeleteButton();
-
-    // ✅ Function to Get Projects from Local Storage
-    function getProjectsFromStorage() {
-        return JSON.parse(localStorage.getItem("projects")) || [];
-    }
-
-    // ✅ Function to Save Projects to Local Storage
-    function saveProjectsToStorage(projects) {
-        localStorage.setItem("projects", JSON.stringify(projects));
-    }
-
-    // ✅ Function to Get Tasks from Local Storage
-    function getTasksFromStorage() {
-        return JSON.parse(localStorage.getItem("tasks")) || [];
-    }
-
-    // ✅ Function to Save Tasks to Local Storage
-    function saveTasksToStorage(tasks) {
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-    }
-
-    // ✅ Function to Load Tasks from Storage and Update the UI
-    function loadTasksFromStorage() {
-        const tableBody = document.querySelector(".tasks-table tbody");
-        if (!tableBody) return; // Ensure tasks table exists
-
-        tableBody.innerHTML = ""; 
-
-        let tasks = getTasksFromStorage();
-
-        // Assign task IDs starting from 1
-        tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
-
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-        tasks.forEach(addTaskToTable);
-    }
-
-    // ✅ Function to Add a Task to the Table
-    function addTaskToTable(task) {
-        const tableBody = document.querySelector(".tasks-table tbody");
-        if (!tableBody) return; // Ensure tasks table exists
-
-        const newRow = document.createElement("tr");
-        newRow.innerHTML = `
-            <td>${task.id}</td>
-            <td>${task.project}</td>
-            <td>${task.taskName}</td>
-            <td>${task.description}</td>
-            <td>${task.assignedStudent}</td>
-            <td class="status ${task.status.toLowerCase()}">${task.status}</td>
-            <td>${task.dueDate}</td>
-        `;
-        tableBody.appendChild(newRow);
-    }
-});
-///////////////////////////////////// delete project  ///////////////////////
