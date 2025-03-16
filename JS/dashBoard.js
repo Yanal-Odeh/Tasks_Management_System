@@ -534,20 +534,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function loadStudents() {
         assignedStudentSelect.innerHTML = '<option value="">Select a student</option>';
-        (JSON.parse(localStorage.getItem("users")) || [])
-            .filter(user => user.role === "Student")
-            .forEach(student => {
-                assignedStudentSelect.innerHTML += `<option value="${student.username}">${student.username}</option>`;
-            });
+        const allUsers = JSON.parse(localStorage.getItem("users")) || [];
+    
+        if (user.role === "Admin") {
+            // Admins see all students
+            allUsers
+                .filter(user => user.role === "Student")
+                .forEach(student => {
+                    assignedStudentSelect.innerHTML += `<option value="${student.username}">${student.username}</option>`;
+                });
+        } else {
+            // Students only see their own name
+            assignedStudentSelect.innerHTML = `<option value="${user.username}" selected>${user.username}</option>`;
+            assignedStudentSelect.disabled = true; // Optional: Prevents selection change
+        }
     }
+    
 
     function loadProjects() {
         projectSelect.innerHTML = '<option value="">Select a project</option>';
-        (JSON.parse(localStorage.getItem("projects")) || [])
-            .forEach(project => {
+        const allProjects = JSON.parse(localStorage.getItem("projects")) || [];
+    
+        if (user.role === "Admin") {
+            // Admins see all projects
+            allProjects.forEach(project => {
                 projectSelect.innerHTML += `<option value="${project.title}">${project.title}</option>`;
             });
+        } else {
+            // Students only see projects they are assigned to
+            const studentProjects = allProjects.filter(project => project.students.includes(user.username));
+    
+            if (studentProjects.length === 0) {
+                projectSelect.innerHTML = '<option value="">No assigned projects</option>';
+            } else {
+                studentProjects.forEach(project => {
+                    projectSelect.innerHTML += `<option value="${project.title}">${project.title}</option>`;
+                });
+            }
+        }
     }
+    
 });
 
 /////////////////////////////////////✅ Task Modal Handling + sorting//////////////////////////////////
