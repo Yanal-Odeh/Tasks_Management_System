@@ -89,6 +89,9 @@ updateDateTime();
 
 /////////////////////////////////////////////time//////////////////////////////////////////////
 
+
+
+
 document.addEventListener("DOMContentLoaded", function () {
 // Get user data
 const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
@@ -413,7 +416,6 @@ document.addEventListener("DOMContentLoaded", function () {
         taskForm.reset();
         loadStudents();
         loadProjects();
-        if (!validateProjectAndStudent()) return;
         toggleModal(true);
     });
 
@@ -427,7 +429,6 @@ document.addEventListener("DOMContentLoaded", function () {
         tableBody.innerHTML = ""; 
         let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-        // Re-assign task IDs dynamically based on their order
         tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
 
         localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -439,28 +440,49 @@ document.addEventListener("DOMContentLoaded", function () {
 
     taskForm.addEventListener("submit", function (event) {
         event.preventDefault();
-        if (!validateProjectAndStudent()) return;
 
         let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-        const task = {
-            id: tasks.length + 1,  // Assigning ID dynamically in order
-            project: projectSelect.value,
-            taskName: document.getElementById("taskName").value,
-            description: document.getElementById("description").value,
-            assignedStudent: assignedStudentSelect.value,
-            status: document.getElementById("status").value,
-            dueDate: document.getElementById("dueDate").value
-        };
+        const taskName = document.getElementById("taskName").value.trim();
+        const description = document.getElementById("description").value.trim();
+        const assignedStudent = assignedStudentSelect.value;
+        const project = projectSelect.value;
+        const status = document.getElementById("status").value;
+        const dueDate = document.getElementById("dueDate").value;
 
-        if (Object.values(task).some(value => !value)) {
+        if (!taskName || !description || !assignedStudent || !project || !status || !dueDate) {
             alert("⚠️ Please fill in all fields.");
             return;
         }
 
+        // Check if a task with the same name already exists
+        if (tasks.some(task => task.taskName.toLowerCase() === taskName.toLowerCase())) {
+            alert("⚠️ A task with this name already exists. Please choose a different name.");
+            return;
+        }
+
+        // Prevent adding tasks with a past due date
+        if (new Date(dueDate) < new Date()) {
+            alert("⚠️ Due date cannot be in the past.");
+            return;
+        }
+
+        const task = {
+            id: tasks.length + 1,
+            project,
+            taskName,
+            description,
+            assignedStudent,
+            status,
+            dueDate
+        };
+
         tasks.push(task);
         localStorage.setItem("tasks", JSON.stringify(tasks));
+
+        // ✅ Instantly add the new task to the table
         addTaskToTable(task);
+
         taskForm.reset();
         toggleModal(false);
     });
@@ -515,23 +537,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 projectSelect.innerHTML += `<option value="${project.title}">${project.title}</option>`;
             });
     }
-
-    function validateProjectAndStudent() {
-        const students = JSON.parse(localStorage.getItem("users")) || [];
-        const projects = JSON.parse(localStorage.getItem("projects")) || [];
-
-        if (!students.some(user => user.role === "Student")) {
-            alert("⚠️ No students available. Please add students first.");
-            return false;
-        }
-        if (projects.length === 0) {
-            alert("⚠️ No projects available. Please add projects first.");
-            return false;
-        }
-        return true;
-    }
 });
-
 
 /////////////////////////////////////✅ Task Modal Handling + sorting//////////////////////////////////
 
@@ -539,43 +545,61 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /////////////////////////////////////dragging task model//////////////////////////////////
 document.addEventListener("DOMContentLoaded", function () {
-    const modal = document.getElementById("taskModal");
+    // Modals & Overlays
+    const taskModal = document.getElementById("taskModal");
+    const editTaskModal = document.getElementById("editTaskModal");
     const overlay = document.querySelector(".modal-overlay");
-    const openModalBtn = document.querySelector(".new-task-btn");
-    const closeModalBtn = modal.querySelector(".close");
-    const modalHeader = modal.querySelector("h2"); // Drag only from header
+
+    // Buttons
+    const openTaskModalBtn = document.querySelector(".new-task-btn");
+    const closeTaskModalBtn = taskModal.querySelector(".close");
+    const openEditTaskModalBtn = document.querySelector(".edit-task-btn");
+    const closeEditTaskModalBtn = editTaskModal.querySelector(".close");
+
+    // Headers for dragging
+    const taskModalHeader = taskModal.querySelector("h2");
+    const editTaskModalHeader = editTaskModal.querySelector("h2");
 
     let isDragging = false;
     let offsetX = 0, offsetY = 0;
+    let activeModal = null; // Track the active modal being dragged
 
-    // ✅ Start dragging when clicking on the "Create New Task" (h2)
-    modalHeader.addEventListener("mousedown", function (event) {
+    // ✅ Function to start dragging (for both modals)
+    function startDragging(event, modal) {
         isDragging = true;
+        activeModal = modal;
         offsetX = event.clientX - modal.offsetLeft;
         offsetY = event.clientY - modal.offsetTop;
         modal.style.cursor = "grabbing";
-    });
+    }
 
-    // ✅ Move modal while dragging (No viewport restriction)
-    document.addEventListener("mousemove", function (event) {
-        if (!isDragging) return;
+    // ✅ Function to move modal while dragging
+    function dragModal(event) {
+        if (!isDragging || !activeModal) return;
 
         let newX = event.clientX - offsetX;
         let newY = event.clientY - offsetY;
 
-        // Allows modal to be dragged anywhere (even outside viewport)
-        modal.style.left = `${newX}px`;
-        modal.style.top = `${newY}px`;
-    });
+        activeModal.style.left = `${newX}px`;
+        activeModal.style.top = `${newY}px`;
+    }
 
-    // ✅ Stop dragging when releasing mouse
-    document.addEventListener("mouseup", function () {
+    // ✅ Function to stop dragging
+    function stopDragging() {
         isDragging = false;
-        modal.style.cursor = "default";
-    });
+        if (activeModal) activeModal.style.cursor = "default";
+        activeModal = null;
+    }
 
-    // ✅ Function to toggle modal visibility (Keeps Position)
-    function toggleModal(show) {
+    // ✅ Add dragging functionality to both modals
+    taskModalHeader.addEventListener("mousedown", (event) => startDragging(event, taskModal));
+    editTaskModalHeader.addEventListener("mousedown", (event) => startDragging(event, editTaskModal));
+
+    document.addEventListener("mousemove", dragModal);
+    document.addEventListener("mouseup", stopDragging);
+
+    // ✅ Function to toggle modal visibility
+    function toggleModal(modal, show) {
         if (show) {
             modal.style.display = "flex";
             overlay.style.display = "block";
@@ -585,20 +609,29 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ✅ Open Modal
-    openModalBtn.addEventListener("click", () => {
-        toggleModal(true);
+    // ✅ Open & Close "Create New Task" Modal
+    openTaskModalBtn.addEventListener("click", () => toggleModal(taskModal, true));
+    closeTaskModalBtn.addEventListener("click", () => toggleModal(taskModal, false));
+
+    // ✅ Open & Close "Edit Task" Modal
+    openEditTaskModalBtn.addEventListener("click", () => toggleModal(editTaskModal, true));
+    closeEditTaskModalBtn.addEventListener("click", () => toggleModal(editTaskModal, false));
+
+    // ✅ Close modals when clicking on overlay
+    overlay.addEventListener("click", () => {
+        toggleModal(taskModal, false);
+        toggleModal(editTaskModal, false);
     });
 
-    // ✅ Close Modal
-    closeModalBtn.addEventListener("click", () => toggleModal(false));
-    overlay.addEventListener("click", () => toggleModal(false));
-
-    // ✅ Close with Escape key
+    // ✅ Close modals with Escape key
     document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") toggleModal(false);
+        if (event.key === "Escape") {
+            toggleModal(taskModal, false);
+            toggleModal(editTaskModal, false);
+        }
     });
 });
+
 
 
 /////////////////////////////////////dragging task model//////////////////////////////////
@@ -1096,6 +1129,12 @@ loadTasksFromStorage();
 });
 
 ///////////////////////////////////// ✅ delete task ///////////////////////
+
+
+
+
+///////////////////////////////////// opcity smooth  ///////////////////////
+
 document.addEventListener("DOMContentLoaded", function () {
 const modal = document.getElementById("taskModal");
 const modalOverlay = document.querySelector(".modal-overlay");
@@ -1131,6 +1170,10 @@ closeModalBtn.addEventListener("click", closeModal);
 // Close modal when clicking outside the modal (overlay)
 modalOverlay.addEventListener("click", closeModal);
 });
+
+
+///////////////////////////////////// opcity smooth  ///////////////////////
+
 
 ///////////////////////////////////// ✅ sign is as a student ///////////////////////
 document.addEventListener("DOMContentLoaded", function () {
@@ -1321,3 +1364,258 @@ function displayProjectDetails(projectTitle) {
 
 
 
+///////////////////////////////////// delete role project ///////////////////////
+document.addEventListener("DOMContentLoaded", function () {
+    const studentCheckbox = document.getElementById("student");
+    const universityIdGroup = document.getElementById("university-id-group");
+    const signupForm = document.getElementById("signup-form");
+
+    // Show or hide university ID field based on checkbox state
+    studentCheckbox.addEventListener("change", function () {
+        universityIdGroup.style.display = studentCheckbox.checked ? "block" : "none";
+    });
+
+    // Handle sign-up form submission
+    signupForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent page reload
+
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+        const isStudent = studentCheckbox.checked;
+        const universityId = document.getElementById("university-id").value.trim();
+
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+
+        // Check if username already exists
+        if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
+            alert("Username already exists! Please choose a different username.");
+            return;
+        }
+
+        // If the user is a student, ensure the university ID is unique
+        if (isStudent) {
+            if (!universityId) {
+                alert("University ID is required for students.");
+                return;
+            }
+
+            if (users.some(user => user.universityId === universityId)) {
+                alert("University ID already exists! Please enter a unique university ID.");
+                return;
+            }
+        }
+
+        // Create new user object
+        const newUser = {
+            username: username,
+            password: password, // ⚠️ Never store passwords in plain text in real apps
+            role: isStudent ? "Student" : "Admin",
+            universityId: isStudent ? universityId : null
+        };
+
+        users.push(newUser);
+        localStorage.setItem("users", JSON.stringify(users));
+
+        alert("Sign-up successful! Redirecting to Sign In page...");
+        window.location.href = "Signin.html";
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const signinForm = document.getElementById("signin-form");
+
+    signinForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent page reload
+
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const staySignedIn = document.getElementById("stay-signed-in").checked;
+
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        // Find the user with the entered credentials
+        const storedUser = users.find(user => user.username === username && user.password === password);
+
+        if (!storedUser) {
+            alert("Invalid username or password. Please try again.");
+            return;
+        }
+
+        alert(`Sign-in successful! Welcome, ${storedUser.role}.`);
+
+        // Store session data
+        const sessionData = { username: storedUser.username, role: storedUser.role };
+
+        if (staySignedIn) {
+            localStorage.setItem("session", JSON.stringify(sessionData));
+        } else {
+            sessionStorage.setItem("session", JSON.stringify(sessionData));
+        }
+
+        // Redirect based on role
+        window.location.href = "DashBoard.html";
+    });
+});
+
+// Hide "Delete Project" button if user is a student
+document.addEventListener("DOMContentLoaded", function () {
+    const deleteProjectBtn = document.querySelector(".delete-project-btn");
+
+    // Get session data from localStorage or sessionStorage
+    const sessionData = JSON.parse(localStorage.getItem("session")) || JSON.parse(sessionStorage.getItem("session"));
+
+    if (sessionData && sessionData.role === "Student") {
+        deleteProjectBtn.style.display = "none";
+    }
+});
+
+///////////////////////////////////// delete role project ///////////////////////
+
+
+
+
+///////////////////////////////////// delete project  ///////////////////////
+document.addEventListener("DOMContentLoaded", function () {
+    const projectContainer = document.getElementById("projectContainer"); // The div where project cards exist
+    const deleteProjectBtn = document.querySelector(".delete-project-btn"); // Delete button
+    let selectedProject = null; // Stores the selected project for deletion
+
+    // ✅ Hide delete button if the user is a student
+    const userRole = localStorage.getItem("userRole"); // Assume user role is stored
+    if (userRole === "student") {
+        deleteProjectBtn.style.display = "none";
+    }
+
+    // ✅ Function to Disable Delete Button (Gray Out)
+    function disableDeleteButton() {
+        deleteProjectBtn.setAttribute("disabled", "true");
+        deleteProjectBtn.style.backgroundColor = "#ccc"; // Gray color
+        deleteProjectBtn.style.cursor = "not-allowed";
+    }
+
+    // ✅ Function to Enable Delete Button (Restore Color)
+    function enableDeleteButton() {
+        deleteProjectBtn.removeAttribute("disabled");
+        deleteProjectBtn.style.backgroundColor = "rgb(8, 113, 224)"; // Original blue color
+        deleteProjectBtn.style.cursor = "pointer";
+    }
+
+    // ✅ Disable delete button initially
+    disableDeleteButton();
+
+    // ✅ Function to Select a Project Card on Left Click
+    projectContainer.addEventListener("click", function (event) {
+        const projectCard = event.target.closest(".project-card"); // Get the clicked project
+        if (!projectCard || projectCard === selectedProject) return; // Prevent reselecting the same one
+
+        // Remove selection from other projects
+        document.querySelectorAll(".project-card").forEach(card => card.classList.remove("selected"));
+
+        // Highlight selected project
+        projectCard.classList.add("selected");
+        selectedProject = projectCard;
+        enableDeleteButton(); // Enable delete button
+    });
+
+    // ✅ Function to Deselect a Project Card on Right Click
+    projectContainer.addEventListener("contextmenu", function (event) {
+        event.preventDefault(); // Prevent default right-click menu
+
+        // Remove selection
+        document.querySelectorAll(".project-card").forEach(card => card.classList.remove("selected"));
+        selectedProject = null;
+
+        // Disable delete button
+        disableDeleteButton();
+    });
+
+    // ✅ Function to Delete a Selected Project & Its Related Tasks
+    deleteProjectBtn.addEventListener("click", function () {
+        if (!selectedProject) return;
+
+        const confirmDelete = confirm("⚠️ Are you sure you want to delete this project and all related tasks?");
+        if (!confirmDelete) return;
+
+        const projectId = parseInt(selectedProject.dataset.id); // Assuming each project card has a data-id
+
+        // Remove project from UI
+        selectedProject.remove();
+
+        // Remove project from Local Storage
+        let projects = getProjectsFromStorage();
+        projects = projects.filter(project => project.id !== projectId);
+        saveProjectsToStorage(projects);
+
+        // ✅ Remove related tasks from Local Storage
+        let tasks = getTasksFromStorage();
+        tasks = tasks.filter(task => task.projectId !== projectId); // Keep only tasks not related to this project
+        saveTasksToStorage(tasks);
+
+        // ✅ Reload tasks table/UI
+        loadTasksFromStorage();
+
+        // ✅ Auto-deselect after deleting
+        selectedProject = null;
+        disableDeleteButton(); // Disable delete button (Gray Out)
+    });
+
+    // ✅ Auto-deselect all projects when the page loads
+    document.querySelectorAll(".project-card").forEach(card => card.classList.remove("selected"));
+    selectedProject = null;
+    disableDeleteButton();
+
+    // ✅ Function to Get Projects from Local Storage
+    function getProjectsFromStorage() {
+        return JSON.parse(localStorage.getItem("projects")) || [];
+    }
+
+    // ✅ Function to Save Projects to Local Storage
+    function saveProjectsToStorage(projects) {
+        localStorage.setItem("projects", JSON.stringify(projects));
+    }
+
+    // ✅ Function to Get Tasks from Local Storage
+    function getTasksFromStorage() {
+        return JSON.parse(localStorage.getItem("tasks")) || [];
+    }
+
+    // ✅ Function to Save Tasks to Local Storage
+    function saveTasksToStorage(tasks) {
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    // ✅ Function to Load Tasks from Storage and Update the UI
+    function loadTasksFromStorage() {
+        const tableBody = document.querySelector(".tasks-table tbody");
+        if (!tableBody) return; // Ensure tasks table exists
+
+        tableBody.innerHTML = ""; 
+
+        let tasks = getTasksFromStorage();
+
+        // Assign task IDs starting from 1
+        tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
+
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        tasks.forEach(addTaskToTable);
+    }
+
+    // ✅ Function to Add a Task to the Table
+    function addTaskToTable(task) {
+        const tableBody = document.querySelector(".tasks-table tbody");
+        if (!tableBody) return; // Ensure tasks table exists
+
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <td>${task.id}</td>
+            <td>${task.project}</td>
+            <td>${task.taskName}</td>
+            <td>${task.description}</td>
+            <td>${task.assignedStudent}</td>
+            <td class="status ${task.status.toLowerCase()}">${task.status}</td>
+            <td>${task.dueDate}</td>
+        `;
+        tableBody.appendChild(newRow);
+    }
+});
+///////////////////////////////////// delete project  ///////////////////////

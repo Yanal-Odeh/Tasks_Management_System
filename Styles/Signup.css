@@ -68,7 +68,7 @@ input {
         border-radius: 0.5rem;
         font-size: 1rem;
         background: rgb(255, 255, 255);
-        color: white;
+        color: black;
         outline: none;
         transition: all 0.3s ease-in-out;
     }
@@ -79,7 +79,6 @@ input::placeholder {
 }
 
 input:focus {
-    background: rgba(255, 255, 255, 0.2);
     border-color: #25d33c;
     box-shadow: 0 0 0.5rem rgba(37, 211, 60, 0.5);
 }

@@ -18,20 +18,21 @@
 }
 
 /* ✅ Add New Project Button */
-.add-project-btn {
-    background-color: #007bff;
+.add-project-btn, .delete-project-btn {
+    background-color:rgb(8, 113, 224);
+
     color: white;
     border: none;
-    padding: 0.7rem 1rem;
+    padding: 0.5rem .8rem;
     font-size: 1rem;
     cursor: pointer;
     border-radius: 5px;
     transition: 0.3s ease-in-out;
-    white-space: nowrap; /* Prevents text from wrapping */
+    white-space: nowrap; 
 }
 
-.add-project-btn:hover {
-    background-color: #0056b3;
+.add-project-btn:hover,.delete-project-btn:hover {
+    background-color:rgb(31, 86, 144);
 }
 
 /* ✅ Search Bar */
@@ -112,10 +113,6 @@
 
 /* ✅ Clickable Border Colors */
 .project-card.selected { border-color: #f39c12; } 
-
-
-
-
 
 /* ✅ Border Colors for Different Statuses */
 .project-card.completed { border-color: blue; }
@@ -214,10 +211,7 @@ div.progress{
     justify-content: center;
     align-items: center;
 }
-.delete-project-btn{
-    padding: 0.2rem;
-    border-radius: 1rem;
-}
+
 /* Details Panel Styling */
 .details-panel {
     position: fixed;
