@@ -1,9 +1,9 @@
-///////////////////////////////////////////aside///////////////////////////////////////////////
-
 document.addEventListener("DOMContentLoaded", function () {
-    // Sidebar Navigation Handling
+    ///////////////////////// Sidebar Navigation /////////////////////////
     const buttons = document.querySelectorAll(".menu-item");
     const sections = document.querySelectorAll(".content-section");
+    const sidebar = document.querySelector("aside");
+    const menuToggle = document.querySelector(".menu-toggle");
 
     buttons.forEach(button => {
         button.addEventListener("click", function () {
@@ -14,30 +14,26 @@ document.addEventListener("DOMContentLoaded", function () {
             // Add "active" class to the clicked button
             this.classList.add("active");
 
-            // Get the corresponding section ID
-            let sectionId = this.textContent.toLowerCase() + "Content";
-
             // Show the matching section
-            document.getElementById(sectionId).classList.add("active");
+            const sectionId = this.textContent.trim().toLowerCase() + "Content";
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add("active");
+            }
 
-            // Close sidebar on mobile after clicking a menu item
+            // Close sidebar on mobile
             if (window.innerWidth <= 768) {
                 sidebar.classList.remove("active");
             }
         });
     });
 
-    // Hamburger Menu Toggle for Mobile
-    const menuToggle = document.querySelector(".menu-toggle");
-    const sidebar = document.querySelector("aside");
-
-    if (menuToggle && sidebar) {
+    if (menuToggle) {
         menuToggle.addEventListener("click", function () {
             sidebar.classList.toggle("active");
         });
     }
 
-    // Close sidebar when clicking outside (for mobile view)
     document.addEventListener("click", function (event) {
         if (window.innerWidth <= 768 && sidebar.classList.contains("active")) {
             if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
@@ -46,180 +42,113 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Ensure sidebar resets on window resize
     window.addEventListener("resize", function () {
-        if (window.innerWidth > 768) {
-            sidebar.classList.add("active"); // Keep sidebar open on larger screens
-        } else {
-            sidebar.classList.remove("active"); // Keep sidebar closed on small screens
-        }
+        sidebar.classList.toggle("active", window.innerWidth > 768);
     });
-});
 
-///////////////////////////////////////////aside///////////////////////////////////////////////
+    ///////////////////////// Date & Time /////////////////////////
+    function updateDateTime() {
+        const now = new Date();
+        const formattedDate = now.toLocaleString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+        }).replace(',', ''); // Removes comma after weekday
 
+        const dateTimeEl = document.getElementById('datetime');
+        if (dateTimeEl) dateTimeEl.textContent = formattedDate;
+    }
 
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
 
-
-
-
-/////////////////////////////////////////////time//////////////////////////////////////////////
-
-// Function to update date & time dynamically
-function updateDateTime() {
-const now = new Date();
-
-const formattedDate = now.toLocaleString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: true
-}).replace(',', '') // Removes comma after weekday
-
-document.getElementById('datetime').textContent = formattedDate;
-}
-
-// Update time every second
-setInterval(updateDateTime, 1000);
-updateDateTime();
-
-/////////////////////////////////////////////time//////////////////////////////////////////////
-
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
-// Get user data
-const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
-if (!userData) {
-    window.location.assign("../Signin.html"); // Redirect if not logged in
-    return;
-}
-
-const user = JSON.parse(userData);
-const isAdmin = user.role === "Admin";
-
-// Elements for dynamic count updates
-const projectCountEl = document.querySelector(".data-item:nth-child(1) p");
-const studentCountEl = document.querySelector(".data-item:nth-child(2)");
-const taskCountEl = document.querySelector(".data-item:nth-child(3) p");
-const finishedProjectCountEl = document.querySelector(".data-item:nth-child(4) p");
-
-// Get data from localStorage
-let projects = JSON.parse(localStorage.getItem("projects")) || [];
-let users = JSON.parse(localStorage.getItem("users")) || [];
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
-// Filter students only
-let students = users.filter(user => user.role === "Student");
-
-// Filter finished projects
-let finishedProjects = projects.filter(project => project.status.toLowerCase() === "completed");
-
-// Update dashboard stats dynamically
-if (isAdmin) {
-    projectCountEl.textContent = projects.length;
-    studentCountEl.style.display = "block";
-    studentCountEl.querySelector("p").textContent = students.length;
-    taskCountEl.textContent = tasks.length;
-    finishedProjectCountEl.textContent = finishedProjects.length;
-} else {
-    projectCountEl.textContent = projects.filter(project => project.students.includes(user.username)).length;
-    studentCountEl.style.display = "none"; // Hide student count for students
-    taskCountEl.textContent = tasks.filter(task => task.assignedStudent === user.username).length;
-    finishedProjectCountEl.textContent = finishedProjects.filter(project => project.students.includes(user.username)).length;
-}
-});
-
-
-/////////////////////////////////////////////chart.js//////////////////////////////////////////////
-document.addEventListener("DOMContentLoaded", function () {
-    // Retrieve user session
+    ///////////////////////// User Session Handling /////////////////////////
     const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
-    
     if (!userData) {
-        window.location.assign("../Signin.html"); // Redirect if not logged in
+        window.location.assign("../Signin.html");
         return;
     }
-    
+
     const user = JSON.parse(userData);
     const isAdmin = user.role === "Admin";
-    
-    // Retrieve data from localStorage
-    let projects = JSON.parse(localStorage.getItem("projects")) || [];
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    
-    // For admin: Get total student count
-    let students = users.filter(user => user.role === "Student");
-    
-    // For admin: Get completed projects
-    let finishedProjects = projects.filter(project => project.status.toLowerCase() === "completed");
-    
-    let chartLabels, chartData;
-    
+
+    // Dynamic Dashboard Updates
+    const projectCountEl = document.querySelector(".data-item:nth-child(1) p");
+    const studentCountEl = document.querySelector(".data-item:nth-child(2)");
+    const taskCountEl = document.querySelector(".data-item:nth-child(3) p");
+    const finishedProjectCountEl = document.querySelector(".data-item:nth-child(4) p");
+
+    const projects = JSON.parse(localStorage.getItem("projects")) || [];
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    const students = users.filter(user => user.role === "Student");
+    const finishedProjects = projects.filter(project => project.status.toLowerCase() === "completed");
+
     if (isAdmin) {
-        // Admin sees everything
-        chartLabels = ["Number of Projects", "Number of Students", "Number of Tasks", "Number of Finished Projects"];
-        chartData = [projects.length, students.length, tasks.length, finishedProjects.length];
+        projectCountEl.textContent = projects.length;
+        studentCountEl.style.display = "block";
+        studentCountEl.querySelector("p").textContent = students.length;
+        taskCountEl.textContent = tasks.length;
+        finishedProjectCountEl.textContent = finishedProjects.length;
     } else {
-        // Student sees only their assigned projects and tasks
-        let studentProjects = projects.filter(project => project.students.includes(user.username));
-        let studentTasks = tasks.filter(task => task.assignedStudent.toLowerCase() === user.username.toLowerCase());
-        let studentFinishedProjects = studentProjects.filter(project => project.status.toLowerCase() === "completed");
-    
-        chartLabels = ["Number of Projects", "Number of Tasks", "Number of Finished Projects"];
-        chartData = [studentProjects.length, studentTasks.length, studentFinishedProjects.length];
+        const studentProjects = projects.filter(project => project.students.includes(user.username));
+        projectCountEl.textContent = studentProjects.length;
+        studentCountEl.style.display = "none";
+        taskCountEl.textContent = tasks.filter(task => task.assignedStudent === user.username).length;
+        finishedProjectCountEl.textContent = studentProjects.filter(project => project.status.toLowerCase() === "completed").length;
     }
-    
-    // Chart Data
-    const ctx = document.getElementById("myChart").getContext("2d");
-    new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: chartLabels, // Dynamic labels based on role
-            datasets: [{
-                label: "Count",
-                data: chartData, // Dynamic data based on role
-                backgroundColor: [
-                    "rgba(47, 138, 230, 0.5)", 
-                    "rgba(216, 189, 39, 0.5)", 
-                    "rgba(139, 69, 19, 0.5)", 
-                    "rgba(128, 0, 128, 0.5)"
-                ],
-                borderColor: [
-                    "rgba(0, 100, 200, 1)", 
-                    "rgba(255, 215, 0, 1)", 
-                    "rgba(139, 69, 19, 1)", 
-                    "rgba(128, 0, 128, 1)"
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: true }
+
+    ///////////////////////// Chart.js Visualization /////////////////////////
+    const ctx = document.getElementById("myChart")?.getContext("2d");
+
+    if (ctx) {
+        let chartLabels, chartData;
+
+        if (isAdmin) {
+            chartLabels = ["Projects", "Students", "Tasks", "Completed Projects"];
+            chartData = [projects.length, students.length, tasks.length, finishedProjects.length];
+        } else {
+            const studentProjects = projects.filter(project => project.students.includes(user.username));
+            const studentTasks = tasks.filter(task => task.assignedStudent.toLowerCase() === user.username.toLowerCase());
+            const studentFinishedProjects = studentProjects.filter(project => project.status.toLowerCase() === "completed");
+
+            chartLabels = ["Projects", "Tasks", "Completed Projects"];
+            chartData = [studentProjects.length, studentTasks.length, studentFinishedProjects.length];
+        }
+
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: "Count",
+                    data: chartData,
+                    backgroundColor: [
+                        "rgba(47, 138, 230, 0.5)",
+                        "rgba(216, 189, 39, 0.5)",
+                        "rgba(139, 69, 19, 0.5)",
+                        "rgba(128, 0, 128, 0.5)"
+                    ],
+                    borderColor: [
+                        "rgba(0, 100, 200, 1)",
+                        "rgba(255, 215, 0, 1)",
+                        "rgba(139, 69, 19, 1)",
+                        "rgba(128, 0, 128, 1)"
+                    ],
+                    borderWidth: 1
+                }]
             },
-            plugins: {
-                legend: {
-                    labels: {
-                        color: "#ddd" // Light gray legend text for dark background
-                    }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } },
+                plugins: {
+                    legend: { labels: { color: "#ddd" } }
                 }
             }
-        }
-    });
-    });
-    
-    
-    
-    /////////////////////////////////////////////chart.js//////////////////////////////////////////////
+        });
+    }
+});
 
 
 ///////////////////////////////////// ✅ edit task ///////////////////////
@@ -384,10 +313,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-
-
-///////////////////////////////////// ✅ Task Modal Handling + sorting //////////////////////////////////
 document.addEventListener("DOMContentLoaded", function () {
+    ///////////////////////////////////// ✅ Task Modal Handling + Sorting //////////////////////////////////
     const modal = document.getElementById("taskModal");
     const overlay = document.querySelector(".modal-overlay");
     const openModalBtn = document.querySelector(".new-task-btn");
@@ -398,30 +325,30 @@ document.addEventListener("DOMContentLoaded", function () {
     const assignedStudentSelect = document.getElementById("assignedStudent");
     const projectSelect = document.getElementById("project");
     const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
+
     if (!userData) {
-        window.location.assign("../Signin.html"); // Redirect if not logged in
+        window.location.assign("../Signin.html");
         return;
     }
+
     const user = JSON.parse(userData);
     const isAdmin = user.role === "Admin";
 
     const statusPriority = {
-        "completed": 1,    
-        "in-progress": 2,  
-        "pending": 3,      
-        "on-hold": 4,      
-        "cancelled": 5     
+        "completed": 1,
+        "in-progress": 2,
+        "pending": 3,
+        "on-hold": 4,
+        "cancelled": 5
     };
 
     modal.style.display = "none";
     overlay.style.display = "none";
 
-
     function toggleModal(show) {
         modal.style.display = show ? "flex" : "none";
         overlay.style.display = show ? "block" : "none";
     }
-
 
     openModalBtn.addEventListener("click", () => {
         taskForm.reset();
@@ -437,21 +364,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function loadTasks() {
-        tableBody.innerHTML = ""; 
+        tableBody.innerHTML = "";
         let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
         tasks = tasks.map((task, index) => ({ ...task, id: index + 1 }));
-
         localStorage.setItem("tasks", JSON.stringify(tasks));
         tasks.forEach(addTaskToTable);
     }
+
     loadTasks();
     loadStudents();
     loadProjects();
 
     taskForm.addEventListener("submit", function (event) {
         event.preventDefault();
-
         let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
         const taskName = document.getElementById("taskName").value.trim();
@@ -466,13 +391,11 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // Check if a task with the same name already exists
         if (tasks.some(task => task.taskName.toLowerCase() === taskName.toLowerCase())) {
-            alert("⚠️ A task with this name already exists. Please choose a different name.");
+            alert("⚠️ A task with this name already exists.");
             return;
         }
 
-        // Prevent adding tasks with a past due date
         if (new Date(dueDate) < new Date()) {
             alert("⚠️ Due date cannot be in the past.");
             return;
@@ -490,10 +413,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         tasks.push(task);
         localStorage.setItem("tasks", JSON.stringify(tasks));
-
-        // ✅ Instantly add the new task to the table
         addTaskToTable(task);
-
         taskForm.reset();
         toggleModal(false);
     });
@@ -501,15 +421,12 @@ document.addEventListener("DOMContentLoaded", function () {
     sortSelect.addEventListener("change", function () {
         let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
         const sortBy = this.value;
-        if (sortBy === "status") {
-            tasks.sort((a, b) => statusPriority[a.status] - statusPriority[b.status]);
-        } else if (sortBy === "project") {
-            tasks.sort((a, b) => a.project.localeCompare(b.project));
-        } else if (sortBy === "due-date") {
-            tasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-        } else if (sortBy === "assigned-student") {
-            tasks.sort((a, b) => a.assignedStudent.localeCompare(b.assignedStudent));
-        }
+        tasks.sort((a, b) => {
+            if (sortBy === "status") return statusPriority[a.status] - statusPriority[b.status];
+            if (sortBy === "project") return a.project.localeCompare(b.project);
+            if (sortBy === "due-date") return new Date(a.dueDate) - new Date(b.dueDate);
+            if (sortBy === "assigned-student") return a.assignedStudent.localeCompare(b.assignedStudent);
+        });
         refreshTable(tasks);
     });
 
@@ -519,262 +436,99 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function addTaskToTable(task) {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${task.id}</td>
-            <td>${task.project}</td>
-            <td>${task.taskName}</td>
-            <td>${task.description}</td>
-            <td>${task.assignedStudent}</td>
-            <td class="status ${task.status}">${task.status}</td>
-            <td>${task.dueDate}</td>
-        `;
-        tableBody.appendChild(row);
+        tableBody.insertAdjacentHTML("beforeend", `
+            <tr>
+                <td>${task.id}</td>
+                <td>${task.project}</td>
+                <td>${task.taskName}</td>
+                <td>${task.description}</td>
+                <td>${task.assignedStudent}</td>
+                <td class="status ${task.status}">${task.status}</td>
+                <td>${task.dueDate}</td>
+            </tr>
+        `);
     }
 
     function loadStudents() {
         assignedStudentSelect.innerHTML = '<option value="">Select a student</option>';
         const allUsers = JSON.parse(localStorage.getItem("users")) || [];
-    
-        if (user.role === "Admin") {
-            // Admins see all students
-            allUsers
-                .filter(user => user.role === "Student")
-                .forEach(student => {
-                    assignedStudentSelect.innerHTML += `<option value="${student.username}">${student.username}</option>`;
-                });
-        } else {
-            // Students only see their own name
-            assignedStudentSelect.innerHTML = `<option value="${user.username}" selected>${user.username}</option>`;
-            assignedStudentSelect.disabled = true; // Optional: Prevents selection change
-        }
+
+        (isAdmin ? allUsers.filter(u => u.role === "Student") : [{ username: user.username }])
+            .forEach(student => {
+                assignedStudentSelect.innerHTML += `<option value="${student.username}">${student.username}</option>`;
+            });
+
+        if (!isAdmin) assignedStudentSelect.disabled = true;
     }
-    
 
     function loadProjects() {
         projectSelect.innerHTML = '<option value="">Select a project</option>';
         const allProjects = JSON.parse(localStorage.getItem("projects")) || [];
-    
-        if (user.role === "Admin") {
-            // Admins see all projects
-            allProjects.forEach(project => {
+        (isAdmin ? allProjects : allProjects.filter(p => p.students.includes(user.username)))
+            .forEach(project => {
                 projectSelect.innerHTML += `<option value="${project.title}">${project.title}</option>`;
             });
-        } else {
-            // Students only see projects they are assigned to
-            const studentProjects = allProjects.filter(project => project.students.includes(user.username));
-    
-            if (studentProjects.length === 0) {
-                projectSelect.innerHTML = '<option value="">No assigned projects</option>';
-            } else {
-                studentProjects.forEach(project => {
-                    projectSelect.innerHTML += `<option value="${project.title}">${project.title}</option>`;
-                });
-            }
-        }
     }
-    
-});
 
-/////////////////////////////////////✅ Task Modal Handling + sorting//////////////////////////////////
+    ///////////////////////////////////// ✅ Night Mode Handling //////////////////////////////////
+    const modeToggle = document.querySelector(".icon");
+    modeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("night-mode");
 
+        // Select and toggle multiple elements at once
+        [
+            "#tasksContent", ".tasks-table-container", ".tasks-header",
+            "#sortTasks", ".new-task-btn", ".tasks-table",
+            "header", "aside", "main", "#myChart"
+        ].forEach(selector => {
+            document.querySelector(selector)?.classList.toggle("light-background");
+        });
 
+        // Table elements
+        document.querySelectorAll(".tasks-table th, .tasks-table td").forEach(el => {
+            el.classList.toggle("dark-text");
+        });
 
-/////////////////////////////////////dragging task model//////////////////////////////////
-document.addEventListener("DOMContentLoaded", function () {
-    // Modals & Overlays
-    const taskModal = document.getElementById("taskModal");
-    const editTaskModal = document.getElementById("editTaskModal");
-    const overlay = document.querySelector(".modal-overlay");
+        // Status elements
+        document.querySelectorAll(".status").forEach(el => {
+            el.classList.toggle("dark-text");
+        });
 
-    // Buttons
-    const openTaskModalBtn = document.querySelector(".new-task-btn");
-    const closeTaskModalBtn = taskModal.querySelector(".close");
-    const openEditTaskModalBtn = document.querySelector(".edit-task-btn");
-    const closeEditTaskModalBtn = editTaskModal.querySelector(".close");
+        // Additional UI elements
+        [
+            ".project-controls input", ".project-controls select",
+            ".chat-part", ".message input"
+        ].forEach(selector => {
+            document.querySelector(selector)?.classList.toggle("teal-background");
+        });
 
-    // Headers for dragging
-    const taskModalHeader = taskModal.querySelector("h2");
-    const editTaskModalHeader = editTaskModal.querySelector("h2");
+        // Modal inputs
+        document.querySelectorAll(".modal input, .modal select, .modal textarea")
+            .forEach(el => el.classList.toggle("light-background"));
+    });
 
-    let isDragging = false;
-    let offsetX = 0, offsetY = 0;
-    let activeModal = null; // Track the active modal being dragged
+    ///////////////////////////////////// ✅ Dragging Task Modal //////////////////////////////////
+    const taskModalHeader = modal.querySelector("h2");
+    let isDragging = false, offsetX = 0, offsetY = 0;
 
-    // ✅ Function to start dragging (for both modals)
-    function startDragging(event, modal) {
+    taskModalHeader.addEventListener("mousedown", (event) => {
         isDragging = true;
-        activeModal = modal;
         offsetX = event.clientX - modal.offsetLeft;
         offsetY = event.clientY - modal.offsetTop;
         modal.style.cursor = "grabbing";
-    }
+    });
 
-    // ✅ Function to move modal while dragging
-    function dragModal(event) {
-        if (!isDragging || !activeModal) return;
+    document.addEventListener("mousemove", (event) => {
+        if (!isDragging) return;
+        modal.style.left = `${event.clientX - offsetX}px`;
+        modal.style.top = `${event.clientY - offsetY}px`;
+    });
 
-        let newX = event.clientX - offsetX;
-        let newY = event.clientY - offsetY;
-
-        activeModal.style.left = `${newX}px`;
-        activeModal.style.top = `${newY}px`;
-    }
-
-    // ✅ Function to stop dragging
-    function stopDragging() {
+    document.addEventListener("mouseup", () => {
         isDragging = false;
-        if (activeModal) activeModal.style.cursor = "default";
-        activeModal = null;
-    }
-
-    // ✅ Add dragging functionality to both modals
-    taskModalHeader.addEventListener("mousedown", (event) => startDragging(event, taskModal));
-    editTaskModalHeader.addEventListener("mousedown", (event) => startDragging(event, editTaskModal));
-
-    document.addEventListener("mousemove", dragModal);
-    document.addEventListener("mouseup", stopDragging);
-
-    // ✅ Function to toggle modal visibility
-    function toggleModal(modal, show) {
-        if (show) {
-            modal.style.display = "flex";
-            overlay.style.display = "block";
-        } else {
-            modal.style.display = "none";
-            overlay.style.display = "none";
-        }
-    }
-
-    // ✅ Open & Close "Create New Task" Modal
-    openTaskModalBtn.addEventListener("click", () => toggleModal(taskModal, true));
-    closeTaskModalBtn.addEventListener("click", () => toggleModal(taskModal, false));
-
-    // ✅ Open & Close "Edit Task" Modal
-    openEditTaskModalBtn.addEventListener("click", () => toggleModal(editTaskModal, true));
-    closeEditTaskModalBtn.addEventListener("click", () => toggleModal(editTaskModal, false));
-
-    // ✅ Close modals when clicking on overlay
-    overlay.addEventListener("click", () => {
-        toggleModal(taskModal, false);
-        toggleModal(editTaskModal, false);
-    });
-
-    // ✅ Close modals with Escape key
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-            toggleModal(taskModal, false);
-            toggleModal(editTaskModal, false);
-        }
+        modal.style.cursor = "default";
     });
 });
-
-
-
-/////////////////////////////////////dragging task model//////////////////////////////////
-
-
-
-/////////////////////////////////////*** ✅ add night mode//////////////////////////////////
-
-const mode = document.querySelector(".icon");
-mode.onclick = changeMode;
-
-function changeMode() {
-document.querySelector("#tasksContent").classList.toggle("light-background");
-document.querySelector(".tasks-table-container").classList.toggle("light-background");
-document.querySelector(".tasks-header").classList.toggle("light-background");
-document.querySelector("#sortTasks").classList.toggle("light-text");
-document.querySelector(".new-task-btn").classList.toggle("light-background");
-
-document.querySelector(".tasks-table").classList.toggle("light-background");
-document.querySelector(".tasks-table-container").classList.toggle("light-background");
-
-document.querySelectorAll(".tasks-table th").forEach(element => {
-    element.classList.toggle("light-background");
-    element.classList.toggle("dark-text");
-});
-
-document.querySelectorAll(".tasks-table td").forEach(element => {
-    element.classList.toggle("dark-text");
-});
-
-document.querySelectorAll(".tasks-table tbody tr:nth-child(even)").forEach(element => {
-    element.classList.toggle("light-background");
-});
-
-document.querySelectorAll(".tasks-table tbody tr:hover").forEach(element => {
-    element.classList.toggle("light-background");
-});
-
-document.querySelectorAll(".status").forEach(element => {
-    element.classList.toggle("dark-text");
-});
-
-document.querySelector("header").classList.toggle("light-background");
-document.querySelector("aside").classList.toggle("light-background");
-document.querySelector("main").classList.toggle("light-background");
-document.querySelector("#myChart").classList.toggle("light-background");
-
-document.querySelectorAll(".data-item").forEach(element => {
-    element.classList.toggle("teal-background");
-});
-
-document.querySelectorAll(".menu-item").forEach(element => {
-    element.classList.toggle("teal-background");
-});
-
-document.querySelectorAll(".menu-item").forEach(element => {
-    element.classList.toggle("blue-background");
-});
-
-document.querySelectorAll(".project-grid div").forEach(element => { 
-    element.classList.toggle("teal-background");
-});
-
-document.querySelectorAll(".student").forEach(element => {
-    element.classList.toggle("teal-background");
-});
-
-document.querySelectorAll(".modal input").forEach(element => { 
-    element.classList.toggle("light-background");
-});
-
-document.querySelectorAll(".modal select").forEach(element => { 
-    element.classList.toggle("light-background");
-});
-
-document.querySelectorAll(".modal textarea").forEach(element => { 
-    element.classList.toggle("light-background");
-});
-
-document.querySelector("header div p").classList.toggle("dark-text");
-document.querySelector("#datetime").classList.toggle("dark-text");
-
-document.querySelector(".project-controls input").classList.toggle("teal-background");
-document.querySelector(".project-controls input").classList.toggle("light-text");
-
-document.querySelector(".project-controls select").classList.toggle("teal-background");
-
-document.querySelector(".chat-part").classList.toggle("teal-background");
-document.querySelector(".message input").classList.toggle("teal-background");
-document.querySelector(".message input").classList.toggle("light-text");
-
-document.querySelector(".modal").classList.toggle("light-background");
-
-// ✅ Toggle Light/Night Mode for Table Header & Borders
-document.querySelector(".tasks-table-container").classList.toggle("night-mode");
-document.querySelector(".tasks-table").classList.toggle("night-mode");
-
-// ✅ Toggle Light/Night Mode for "Sort By" Label
-document.querySelector("label[for='sortTasks']").classList.toggle("night-mode");
-
-}
-
-
-/////////////////////////////////////*** ✅ add night mode//////////////////////////////////
-
-
 
 
 
@@ -1001,8 +755,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Load projects on page load
     renderProjects();
 });
-
-
 
 /////////////////////////////////////*** ✅  project tab ///////////////////////
 
@@ -1387,117 +1139,4 @@ function displayProjectDetails(projectTitle) {
 
 
 ///////////////////////////////////// ✅ sign is as a student ///////////////////////
-
-
-
-///////////////////////////////////// delete role project ///////////////////////
-document.addEventListener("DOMContentLoaded", function () {
-    const studentCheckbox = document.getElementById("student");
-    const universityIdGroup = document.getElementById("university-id-group");
-    const signupForm = document.getElementById("signup-form");
-
-    // Show or hide university ID field based on checkbox state
-    studentCheckbox.addEventListener("change", function () {
-        universityIdGroup.style.display = studentCheckbox.checked ? "block" : "none";
-    });
-
-    // Handle sign-up form submission
-    signupForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent page reload
-
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value;
-        const isStudent = studentCheckbox.checked;
-        const universityId = document.getElementById("university-id").value.trim();
-
-        let users = JSON.parse(localStorage.getItem("users")) || [];
-
-        // Check if username already exists
-        if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
-            alert("Username already exists! Please choose a different username.");
-            return;
-        }
-
-        // If the user is a student, ensure the university ID is unique
-        if (isStudent) {
-            if (!universityId) {
-                alert("University ID is required for students.");
-                return;
-            }
-
-            if (users.some(user => user.universityId === universityId)) {
-                alert("University ID already exists! Please enter a unique university ID.");
-                return;
-            }
-        }
-
-        // Create new user object
-        const newUser = {
-            username: username,
-            password: password, // ⚠️ Never store passwords in plain text in real apps
-            role: isStudent ? "Student" : "Admin",
-            universityId: isStudent ? universityId : null
-        };
-
-        users.push(newUser);
-        localStorage.setItem("users", JSON.stringify(users));
-
-        alert("Sign-up successful! Redirecting to Sign In page...");
-        window.location.href = "Signin.html";
-    });
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const signinForm = document.getElementById("signin-form");
-
-    signinForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent page reload
-
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
-        const staySignedIn = document.getElementById("stay-signed-in").checked;
-
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-
-        // Find the user with the entered credentials
-        const storedUser = users.find(user => user.username === username && user.password === password);
-
-        if (!storedUser) {
-            alert("Invalid username or password. Please try again.");
-            return;
-        }
-
-        alert(`Sign-in successful! Welcome, ${storedUser.role}.`);
-
-        // Store session data
-        const sessionData = { username: storedUser.username, role: storedUser.role };
-
-        if (staySignedIn) {
-            localStorage.setItem("session", JSON.stringify(sessionData));
-        } else {
-            sessionStorage.setItem("session", JSON.stringify(sessionData));
-        }
-
-        // Redirect based on role
-        window.location.href = "DashBoard.html";
-    });
-});
-
-// Hide "Delete Project" button if user is a student
-document.addEventListener("DOMContentLoaded", function () {
-    const deleteProjectBtn = document.querySelector(".delete-project-btn");
-
-    // Get session data from localStorage or sessionStorage
-    const sessionData = JSON.parse(localStorage.getItem("session")) || JSON.parse(sessionStorage.getItem("session"));
-
-    if (sessionData && sessionData.role === "Student") {
-        deleteProjectBtn.style.display = "none";
-    }
-});
-
-///////////////////////////////////// delete role project ///////////////////////
-
-
-
-
 
