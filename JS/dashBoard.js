@@ -818,226 +818,12 @@ if (logoutBtn) {
 
 
 
-/////////////////////////////////////*** ✅  project tab ///////////////////////
-document.addEventListener("DOMContentLoaded", function () {
-    const projectContainer = document.getElementById("projectContainer");
-    const projectForm = document.getElementById("projectForm");
-    const modal = document.getElementById("projectModal");
-    const overlay = document.querySelector(".modal-overlay");
-    const addProjectBtn = document.querySelector(".add-project-btn");
-    const closeModalBtn = document.querySelector(".modal .close");
-    const projectSearch = document.getElementById("projectSearch");
-    const projectStatusFilter = document.getElementById("projectStatusFilter");
-    const studentsList = document.getElementById("studentsList");
-
-    // Retrieve users from localStorage
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    // Filter only students
-    const students = users.filter(user => user.role === "Student");
-
-    // Populate the students dropdown list
-    if (students.length > 0) {
-        studentsList.innerHTML = "";
-        students.forEach(student => {
-            const option = document.createElement("option");
-            option.textContent = student.username;
-            option.value = student.username;
-            studentsList.appendChild(option);
-        });
-    } else {
-        studentsList.innerHTML = "<option>No students registered</option>";
-    }
-
-    // Load projects from localStorage
-    let projects = JSON.parse(localStorage.getItem("projects")) || [];
-
-    // Function to save projects to localStorage
-    function saveProjectsToStorage() {
-        localStorage.setItem("projects", JSON.stringify(projects));
-    }
-
-    // Function to delete a project AND its related tasks
-    function deleteProject(index) {
-        if (confirm("Are you sure you want to delete this project? All related tasks will also be removed.")) {
-            const deletedProjectTitle = projects[index].title;
-
-            // Remove project from the array
-            projects.splice(index, 1);
-
-            // Update localStorage for projects
-            saveProjectsToStorage();
-
-            // Delete tasks related to this project
-            deleteTasksForProject(deletedProjectTitle);
-
-            // Re-render projects and tasks
-            renderProjects();
-        }
-    }
-
-    // Function to delete all tasks related to a deleted project
-    function deleteTasksForProject(projectTitle) {
-        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-        
-        // Filter out tasks related to the deleted project
-        tasks = tasks.filter(task => task.project !== projectTitle);
-
-        // Save updated tasks back to localStorage
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-
-        // Refresh tasks UI (if applicable)
-        if (typeof loadTasks === "function") {
-            loadTasks();
-        }
-    }
-
-    // Function to render projects
-    function renderProjects(filteredProjects = projects) {
-        projectContainer.innerHTML = "";
-
-        if (filteredProjects.length === 0) {
-            projectContainer.innerHTML = `<p style="color: white;">No projects found.</p>`;
-            return;
-        }
-
-        filteredProjects.forEach((project, index) => {
-            const projectCard = document.createElement("div");
-            projectCard.classList.add("project-card");
-            projectCard.style.border = `2px solid ${project.borderColor}`;
-
-            projectCard.innerHTML = `
-                <h3 style="color:${project.borderColor}">${project.title}</h3>
-                <p><strong>Description:</strong> ${project.description}</p>
-                <p><strong>Students:</strong> ${project.students.join(", ")}</p>
-                <p><strong>Category:</strong> ${project.category}</p>
-                <p><strong>Status:</strong> ${project.status}</p>
-                <div class="progress-bar">
-                    <div class="progress" style="width:${project.progress}%">${project.progress}%</div>
-                </div>
-                <p>${project.startDate} &nbsp;&nbsp;&nbsp; ${project.endDate}</p>
-                <button class="delete-btn" data-index="${index}">❌ Delete</button>
-            `;
-
-            projectContainer.appendChild(projectCard);
-        });
-
-        // Add event listeners for delete buttons
-        document.querySelectorAll(".delete-btn").forEach(button => {
-            button.addEventListener("click", function () {
-                const index = this.getAttribute("data-index");
-                deleteProject(index);
-            });
-        });
-    }
-
-    // Function to filter projects based on search and status
-    function filterProjects() {
-        const searchTerm = projectSearch.value.toLowerCase().trim();
-        const selectedStatus = projectStatusFilter.value.trim();
-
-        const filteredProjects = projects.filter(project => {
-            const matchesSearch = project.title.toLowerCase().includes(searchTerm) || project.description.toLowerCase().includes(searchTerm);
-            const matchesStatus = selectedStatus === "all" || project.status.toLowerCase() === selectedStatus.toLowerCase();
-            return matchesSearch && matchesStatus;
-        });
-
-        renderProjects(filteredProjects);
-    }
-
-    // Event listeners for search and filter
-    projectSearch.addEventListener("input", filterProjects);
-    projectStatusFilter.addEventListener("change", filterProjects);
-
-    // Function to handle form submission (adding new project)
-    projectForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const title = document.getElementById("projectTitle").value;
-        const description = document.getElementById("projectDescription").value;
-        const students = Array.from(document.getElementById("studentsList").selectedOptions).map(option => option.value);
-        const category = document.getElementById("projectCategory").value;
-        const startDate = document.getElementById("startDate").value;
-        const endDate = document.getElementById("endDate").value;
-        const status = document.getElementById("projectStatus").value.trim();
-
-        if (!title || !description || students.length === 0 || category === "Select a category" || !startDate || !endDate) {
-            alert("Please fill in all fields.");
-            return;
-        }
-
-        const borderColor = status === "Completed" ? "orange" : status === "In-Progress" ? "blue" : "gray";
-        const progress = status === "Completed" ? 100 : status === "In-Progress" ? 50 : 0;
-
-        // Add new project to array
-        projects.push({ title, description, students, category, startDate, endDate, status, progress, borderColor });
-
-        // Save to localStorage
-        saveProjectsToStorage();
-
-        // Refresh Project List
-        renderProjects();
-        projectForm.reset();
-        modal.style.display = "none";
-        overlay.style.display = "none";
-    });
-
-    // Open/Close Modal
-    addProjectBtn.addEventListener("click", function () {
-        modal.style.display = "block";
-        overlay.style.display = "block";
-    });
-
-    closeModalBtn.addEventListener("click", function () {
-        modal.style.display = "none";
-        overlay.style.display = "none";
-    });
-
-    overlay.addEventListener("click", function () {
-        modal.style.display = "none";
-        overlay.style.display = "none";
-    });
-
-    // Load projects on page load
-    renderProjects();
-});
 
 
 
-/////////////////////////////////////*** ✅  project tab ///////////////////////
 
 
 
-/////////////////////////////////////*** ✅ project Modal Handling //////////////////////////////////
-
-document.addEventListener("DOMContentLoaded", function () {
-    const modal = document.getElementById("projectModal");
-    const overlay = document.querySelector(".modal-overlay");
-    const openModalBtn = document.querySelector(".add-project-btn");
-    const closeModalBtn = document.querySelector(".modal .close");
-    
-    // Open modal
-    openModalBtn.addEventListener("click", function () {
-        modal.style.display = "block";
-        overlay.style.display = "block";
-    });
-    
-    // Close modal
-    closeModalBtn.addEventListener("click", function () {
-        modal.style.display = "none";
-        overlay.style.display = "none";
-    });
-    
-    // Close modal when clicking outside
-    overlay.addEventListener("click", function () {
-        modal.style.display = "none";
-        overlay.style.display = "none";
-    });
-    });
-    
-    
-    /////////////////////////////////////*** ✅ Project Modal Handling //////////////////////////////////
-    
     
 
 
@@ -1201,111 +987,295 @@ modalOverlay.addEventListener("click", closeModal);
 ///////////////////////////////////// opcity smooth  ///////////////////////
 
 
-///////////////////////////////////// ✅ sign is as a student ///////////////////////
+
+
+
 document.addEventListener("DOMContentLoaded", function () {
-// Get logged-in user details
-const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
-if (!userData) {
-    window.location.assign("../Signin.html"); // Redirect if not logged in
-    return;
-}
-
-const user = JSON.parse(userData);
-const isAdmin = user.role === "Admin";
-
-// Hide "Add Project" button for students
-const addProjectBtn = document.querySelector(".add-project-btn");
-if (!isAdmin && addProjectBtn) {
-    addProjectBtn.style.display = "none";
-}
-
-// Filter Projects by Assigned Students
-function filterProjects() {
-    const projectContainer = document.getElementById("projectContainer");
-    let projects = JSON.parse(localStorage.getItem("projects")) || [];
-    
-    if (!isAdmin) {
-        projects = projects.filter(project => project.students.includes(user.username));
+    ///////////////////////////////////// ✅ User Authentication & Role Handling //////////////////////////////////
+    const userData = sessionStorage.getItem("session") || localStorage.getItem("session");
+    if (!userData) {
+        window.location.assign("../Signin.html"); // Redirect if not logged in
+        return;
     }
-    
-    renderProjects(projects);
-}
 
-function renderProjects(filteredProjects) {
+    const user = JSON.parse(userData);
+    const isAdmin = user.role === "Admin";
+
+    // Hide "Add Project" button for students
+    const addProjectBtn = document.querySelector(".add-project-btn");
+    if (!isAdmin) {
+        addProjectBtn.style.display = "none";
+    }
+    else
+    addProjectBtn.style.display = "block";
+
+    ///////////////////////////////////// ✅ DOM Elements //////////////////////////////////
     const projectContainer = document.getElementById("projectContainer");
-    projectContainer.innerHTML = "";
-    
-    filteredProjects.forEach((project, index) => {
-        const projectCard = document.createElement("div");
-        projectCard.classList.add("project-card");
-        projectCard.style.border = `2px solid ${project.borderColor}`;
+    const projectForm = document.getElementById("projectForm");
+    const modal = document.getElementById("projectModal");
+    const overlay = document.querySelector(".modal-overlay");
+    const closeModalBtn = document.querySelector(".modal .close");
+    const projectSearch = document.getElementById("projectSearch");
+    const projectStatusFilter = document.getElementById("projectStatusFilter");
+    const studentsList = document.getElementById("studentsList");
+    const tasksTableBody = document.querySelector(".tasks-table tbody");
 
-        projectCard.innerHTML = `
-            <h3 style="color:${project.borderColor}">${project.title}</h3>
-            <p><strong>Description:</strong> ${project.description}</p>
-            <p><strong>Students:</strong> ${project.students.join(", ")}</p>
-            <p><strong>Category:</strong> ${project.category}</p>
-            <p><strong>Status:</strong> ${project.status}</p>
-            <p>${project.startDate} - ${project.endDate}</p>
-        `;
-        
-        if (isAdmin) {
-            projectCard.innerHTML += `<button class="delete-project-btn" data-index="${index}">Delete</button>`;
+    ///////////////////////////////////// ✅ Local Storage Helpers //////////////////////////////////
+    function getProjectsFromStorage() {
+        return JSON.parse(localStorage.getItem("projects")) || [];
+    }
+
+    function saveProjectsToStorage(projects) {
+        localStorage.setItem("projects", JSON.stringify(projects));
+    }
+
+    function getTasksFromStorage() {
+        return JSON.parse(localStorage.getItem("tasks")) || [];
+    }
+
+    function saveTasksToStorage(tasks) {
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    ///////////////////////////////////// ✅ Populate Students Dropdown //////////////////////////////////
+    function populateStudentsDropdown() {
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        const students = users.filter(user => user.role === "Student");
+
+        studentsList.innerHTML = students.length
+            ? students.map(student => `<option value="${student.username}">${student.username}</option>`).join("")
+            : "<option>No students registered</option>";
+    }
+
+    populateStudentsDropdown();
+
+    ///////////////////////////////////// ✅ Render Projects //////////////////////////////////
+    function renderProjects() {
+        let projects = getProjectsFromStorage();
+        projectContainer.innerHTML = "";
+
+        // Filter projects for students
+        if (!isAdmin) {
+            projects = projects.filter(project => project.students.includes(user.username));
         }
-        
-        projectContainer.appendChild(projectCard);
-    });
-}
 
-// Filter Tasks by Assigned Student
-function filterTasks() {
-    const tableBody = document.querySelector(".tasks-table tbody");
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        if (projects.length === 0) {
+            projectContainer.innerHTML = `<p style="color: white;">No projects found.</p>`;
+            return;
+        }
 
-    if (!isAdmin) {
-        // Ensure usernames are case-insensitive and match exactly
-        tasks = tasks.filter(task => task.assignedStudent.toLowerCase() === user.username.toLowerCase());
+        projects.forEach((project, index) => {
+            const projectCard = document.createElement("div");
+            projectCard.classList.add("project-card");
+            projectCard.style.border = `2px solid ${project.borderColor}`;
+
+            projectCard.innerHTML = `
+                <h3 style="color:${project.borderColor}">${project.title}</h3>
+                <p><strong>Description:</strong> ${project.description}</p>
+                <p><strong>Students:</strong> ${project.students.join(", ")}</p>
+                <p><strong>Category:</strong> ${project.category}</p>
+                <p><strong>Status:</strong> ${project.status}</p>
+                <div class="progress-bar">
+                    <div class="progress" style="width:${project.progress}%">${project.progress}%</div>
+                </div>
+                <p>${project.startDate} &nbsp;&nbsp;&nbsp; ${project.endDate}</p>
+                ${isAdmin ? `<button class="delete-btn" data-index="${index}">❌ Delete</button>` : ""}
+            `;
+
+            projectContainer.appendChild(projectCard);
+        });
+
+        // Attach event listeners for delete buttons (only admins)
+        if (isAdmin) {
+            document.querySelectorAll(".delete-btn").forEach(button => {
+                button.addEventListener("click", function () {
+                    deleteProject(this.dataset.index);
+                });
+            });
+        }
     }
 
-    renderTasks(tasks);
-}
+    ///////////////////////////////////// ✅ Delete Project & Related Tasks //////////////////////////////////
+    function deleteProject(index) {
+        if (!confirm("Are you sure you want to delete this project? All related tasks will also be removed.")) return;
 
+        let projects = getProjectsFromStorage();
+        const deletedProjectTitle = projects[index].title;
+        projects.splice(index, 1);
+        saveProjectsToStorage(projects);
 
-function renderTasks(filteredTasks) {
-    const tableBody = document.querySelector(".tasks-table tbody");
-    tableBody.innerHTML = ""; // Clear old tasks before rendering
+        // Delete related tasks
+        let tasks = getTasksFromStorage().filter(task => task.project !== deletedProjectTitle);
+        saveTasksToStorage(tasks);
 
-    filteredTasks.forEach(task => {
-        const newRow = document.createElement("tr");
-        newRow.innerHTML = `
-            <td>${task.id}</td>
-            <td>${task.project}</td>
-            <td>${task.taskName}</td>
-            <td>${task.description}</td>
-            <td>${task.assignedStudent}</td>
-            <td class="status ${task.status.toLowerCase()}">${task.status}</td>
-            <td>${task.dueDate}</td>
-        `;
-        tableBody.appendChild(newRow);
+        renderProjects();
+        renderTasks();
+    }
+
+    ///////////////////////////////////// ✅ Render Tasks //////////////////////////////////
+    function renderTasks() {
+        let tasks = getTasksFromStorage();
+        tasksTableBody.innerHTML = "";
+
+        // Filter tasks for students
+        if (!isAdmin) {
+            tasks = tasks.filter(task => task.assignedStudent.toLowerCase() === user.username.toLowerCase());
+        }
+
+        tasks.forEach(task => {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td>${task.id}</td>
+                <td>${task.project}</td>
+                <td>${task.taskName}</td>
+                <td>${task.description}</td>
+                <td>${task.assignedStudent}</td>
+                <td class="status ${task.status.toLowerCase()}">${task.status}</td>
+                <td>${task.dueDate}</td>
+            `;
+            tasksTableBody.appendChild(newRow);
+        });
+    }
+
+    ///////////////////////////////////// ✅ Filter Projects Based on Search & Status //////////////////////////////////
+    function filterProjects() {
+        const searchTerm = projectSearch.value.toLowerCase().trim();
+        let selectedStatus = projectStatusFilter.value.toLowerCase().trim();
+        
+        if (selectedStatus === "all statuses" || selectedStatus === "all") {
+            selectedStatus = ""; // Treat as no filter
+        }
+    
+        let projects = getProjectsFromStorage();
+    
+        if (!isAdmin) {
+            projects = projects.filter(project => project.students.includes(user.username));
+        }
+    
+        const filteredProjects = projects.filter(project =>
+            (project.title.toLowerCase().includes(searchTerm) || project.description.toLowerCase().includes(searchTerm)) &&
+            (selectedStatus === "" || project.status.toLowerCase() === selectedStatus)
+        );
+    
+        // Clear and re-render projects
+        projectContainer.innerHTML = "";
+    
+        if (filteredProjects.length === 0) {
+            projectContainer.innerHTML = `<p style="color: white;">No projects found.</p>`;
+            return;
+        }
+    
+        filteredProjects.forEach((project, index) => {
+            const projectCard = document.createElement("div");
+            projectCard.classList.add("project-card");
+            projectCard.style.border = `2px solid ${project.borderColor}`;
+    
+            projectCard.innerHTML = `
+                <h3 style="color:${project.borderColor}">${project.title}</h3>
+                <p><strong>Description:</strong> ${project.description}</p>
+                <p><strong>Students:</strong> ${project.students.join(", ")}</p>
+                <p><strong>Category:</strong> ${project.category}</p>
+                <p><strong>Status:</strong> ${project.status}</p>
+                <div class="progress-bar">
+                    <div class="progress" style="width:${project.progress}%">${project.progress}%</div>
+                </div>
+                <p>${project.startDate} &nbsp;&nbsp;&nbsp; ${project.endDate}</p>
+                ${isAdmin ? `<button class="delete-btn" data-index="${index}">❌ Delete</button>` : ""}
+            `;
+    
+            projectContainer.appendChild(projectCard);
+        });
+    
+        // Attach event listeners for delete buttons (only admins)
+        if (isAdmin) {
+            document.querySelectorAll(".delete-btn").forEach(button => {
+                button.addEventListener("click", function () {
+                    deleteProject(this.dataset.index);
+                });
+            });
+        }
+    }
+    
+    // Attach event listeners
+    projectSearch.addEventListener("input", filterProjects);
+    projectStatusFilter.addEventListener("change", filterProjects);
+    ///////////////////////////////////// ✅ Handle New Project Form Submission //////////////////////////////////
+    projectForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const title = document.getElementById("projectTitle").value.trim();
+        const description = document.getElementById("projectDescription").value.trim();
+        const students = Array.from(studentsList.selectedOptions).map(option => option.value);
+        const category = document.getElementById("projectCategory").value;
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+        const status = document.getElementById("projectStatus").value.trim();
+
+        if (!title || !description || students.length === 0 || category === "Select a category" || !startDate || !endDate) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        const borderColor = status === "Completed" ? "orange" : status === "In-Progress" ? "blue" : "gray";
+        const progress = status === "Completed" ? 100 : status === "In-Progress" ? 50 : 0;
+
+        let projects = getProjectsFromStorage();
+        projects.push({ title, description, students, category, startDate, endDate, status, progress, borderColor });
+        saveProjectsToStorage(projects);
+
+        renderProjects();
+        projectForm.reset();
+        toggleModal(false);
     });
-}
 
+    function toggleModal(show) {
+        modal.style.display = show ? "block" : "none";
+        overlay.style.display = show ? "block" : "none";
+    }
 
+    addProjectBtn.addEventListener("click", () => toggleModal(true));
+    closeModalBtn.addEventListener("click", () => toggleModal(false));
+    overlay.addEventListener("click", () => toggleModal(false));
 
-// Initial Filtering
-filterProjects();
-filterTasks();
+    renderProjects();
+    renderTasks();
 });
 
 
 
+/////////////////////////////////////*** ✅ project Modal Handling //////////////////////////////////
+
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("projectModal");
+    const overlay = document.querySelector(".modal-overlay");
+    const openModalBtn = document.querySelector(".add-project-btn");
+    const closeModalBtn = document.querySelector(".modal .close");
+    
+    // Open modal
+    openModalBtn.addEventListener("click", function () {
+        modal.style.display = "block";
+        overlay.style.display = "block";
+    });
+    
+    // Close modal
+    closeModalBtn.addEventListener("click", function () {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+    
+    // Close modal when clicking outside
+    overlay.addEventListener("click", function () {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    });
+    });
+    
+    
+    /////////////////////////////////////*** ✅ Project Modal Handling //////////////////////////////////
 
 
 
 
-
-
-///////////////////////////////////// ✅ sign is as a student ///////////////////////
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -1388,114 +1358,6 @@ function displayProjectDetails(projectTitle) {
 
 ///////////////////////////////////// ✅ sign is as a student ///////////////////////
 
-
-
-///////////////////////////////////// delete role project ///////////////////////
-document.addEventListener("DOMContentLoaded", function () {
-    const studentCheckbox = document.getElementById("student");
-    const universityIdGroup = document.getElementById("university-id-group");
-    const signupForm = document.getElementById("signup-form");
-
-    // Show or hide university ID field based on checkbox state
-    studentCheckbox.addEventListener("change", function () {
-        universityIdGroup.style.display = studentCheckbox.checked ? "block" : "none";
-    });
-
-    // Handle sign-up form submission
-    signupForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent page reload
-
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value;
-        const isStudent = studentCheckbox.checked;
-        const universityId = document.getElementById("university-id").value.trim();
-
-        let users = JSON.parse(localStorage.getItem("users")) || [];
-
-        // Check if username already exists
-        if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
-            alert("Username already exists! Please choose a different username.");
-            return;
-        }
-
-        // If the user is a student, ensure the university ID is unique
-        if (isStudent) {
-            if (!universityId) {
-                alert("University ID is required for students.");
-                return;
-            }
-
-            if (users.some(user => user.universityId === universityId)) {
-                alert("University ID already exists! Please enter a unique university ID.");
-                return;
-            }
-        }
-
-        // Create new user object
-        const newUser = {
-            username: username,
-            password: password, // ⚠️ Never store passwords in plain text in real apps
-            role: isStudent ? "Student" : "Admin",
-            universityId: isStudent ? universityId : null
-        };
-
-        users.push(newUser);
-        localStorage.setItem("users", JSON.stringify(users));
-
-        alert("Sign-up successful! Redirecting to Sign In page...");
-        window.location.href = "Signin.html";
-    });
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const signinForm = document.getElementById("signin-form");
-
-    signinForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent page reload
-
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
-        const staySignedIn = document.getElementById("stay-signed-in").checked;
-
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-
-        // Find the user with the entered credentials
-        const storedUser = users.find(user => user.username === username && user.password === password);
-
-        if (!storedUser) {
-            alert("Invalid username or password. Please try again.");
-            return;
-        }
-
-        alert(`Sign-in successful! Welcome, ${storedUser.role}.`);
-
-        // Store session data
-        const sessionData = { username: storedUser.username, role: storedUser.role };
-
-        if (staySignedIn) {
-            localStorage.setItem("session", JSON.stringify(sessionData));
-        } else {
-            sessionStorage.setItem("session", JSON.stringify(sessionData));
-        }
-
-        // Redirect based on role
-        window.location.href = "DashBoard.html";
-    });
-});
-
-// Hide "Delete Project" button if user is a student
-document.addEventListener("DOMContentLoaded", function () {
-    const deleteProjectBtn = document.querySelector(".delete-project-btn");
-
-    // Get session data from localStorage or sessionStorage
-    const sessionData = JSON.parse(localStorage.getItem("session")) || JSON.parse(sessionStorage.getItem("session"));
-
-    if (sessionData && sessionData.role === "Student") {
-        deleteProjectBtn.style.display = "none";
-    }
-});
-
-///////////////////////////////////// delete role project ///////////////////////
 
 
 
