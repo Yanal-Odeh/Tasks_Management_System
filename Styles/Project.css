@@ -29,11 +29,10 @@
     border-radius: 5px;
     transition: 0.3s ease-in-out;
     white-space: nowrap; 
+    display: none;
 }
 
-.add-project-btn:hover,.delete-project-btn:hover {
-    background-color:rgb(31, 86, 144);
-}
+
 
 /* ✅ Search Bar */
 #projectSearch {
