@@ -1,0 +1,243 @@
+.section-title {
+  color: #007bff;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+.project-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+.add-project-btn {
+  background-color: #0871e0;
+  color: white;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s ease-in-out;
+  white-space: nowrap;
+  display: none;
+}
+.delete-project-btn {
+  background-color: #0871e0;
+  color: white;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s ease-in-out;
+  white-space: nowrap;
+  display: none;
+}
+#projectSearch {
+  flex-grow: 1;
+  padding: 0.7rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #222;
+  color: white;
+}
+#projectStatusFilter {
+  padding: 0.7rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #222;
+  color: white;
+  min-width: 150px;
+}
+.project-grid {
+  grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
+  justify-content: center;
+  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+.project-card {
+  background-color: #2c2c2c;
+  color: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0px 1px 7px 9px rgba(0, 0, 0, 0.3);
+  border: 2px solid transparent;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.project-card:hover {
+  transform: scale(1.03);
+}
+.project-card h3 {
+  font-size: 1.2rem;
+  color: #007bff;
+  margin-bottom: 0.5rem;
+}
+.project-card p {
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+.project-card .progress-bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #444;
+  margin-top: 0.5rem;
+  position: relative;
+}
+.project-card .progress-bar .progress {
+  height: 100%;
+  background-color: #007bff;
+  border-radius: 5px;
+}
+.project-card.selected {
+  border-color: #f39c12;
+}
+.project-card.completed {
+  border-color: blue;
+}
+.project-card.in-progress {
+  border-color: orange;
+}
+.project-card.pending {
+  border-color: gray;
+}
+#projectModal.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  max-width: 90%;
+  background-color: #1e1e1e;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+.modal .close {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+}
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+.submit-btn {
+  width: 100%;
+  background-color: green;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background-color: #444;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+.progress {
+  height: 100%;
+  text-align: center;
+  color: white;
+  background-color: blue;
+  border-radius: 5px;
+}
+div.progress {
+  padding: 0.7rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.details-panel {
+  position: fixed;
+  right: 0;
+  top: 60px;
+  width: 350px;
+  height: 100%;
+  background: #111;
+  color: white;
+  padding: 20px;
+  overflow-y: auto;
+  border-left: 2px solid #444;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  display: none;
+  transition: transform 0.3s ease-in-out;
+}
+.details-panel h2 {
+  color: cyan;
+  margin-bottom: 10px;
+}
+.details-panel h3 {
+  border-bottom: 2px solid cyan;
+  padding-bottom: 5px;
+  margin-top: 15px;
+}
+.close-button {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  position: absolute;
+  right: 15px;
+  top: 10px;
+}
+.task-card {
+  background: #222;
+  padding: 10px;
+  margin-top: 10px;
+  border-left: 5px solid cyan;
+  border-radius: 5px;
+}
+@media screen and (max-width: 768px) {
+  .project-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7rem;
+  }
+  #projectSearch {
+    width: 100%;
+  }
+  #projectStatusFilter {
+    width: 100%;
+  }
+}
+@media screen and (min-width: 900px) {
+  .project-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media screen and (max-width: 900px) {
+  .project-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media screen and (max-width: 600px) {
+  .project-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
