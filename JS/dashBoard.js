@@ -1,5 +1,5 @@
 ///////////////////////////////////////////aside///////////////////////////////////////////////
-
+//
 document.addEventListener("DOMContentLoaded", function () {
     // Sidebar Navigation Handling
     const buttons = document.querySelectorAll(".menu-item");
